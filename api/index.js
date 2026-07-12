@@ -45,20 +45,20 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use("/api/auth", require("./routes/auth.routes"));
-app.use("/api/assets", require("./routes/asset.routes"));
-app.use("/api/departments", require("./routes/department.routes"));
-app.use("/api/categories", require("./routes/category.routes"));
-app.use("/api/users", require("./routes/user.routes"));
-app.use("/api/allocations", require("./routes/allocation.routes"));
-app.use("/api/bookings", require("./routes/booking.routes"));
-app.use("/api/maintenance", require("./routes/maintenance.routes"));
-app.use("/api/transfers", require("./routes/transfer.routes"));
-app.use("/api/notifications", require("./routes/notification.routes"));
-app.use("/api/audits", require("./routes/audit.routes"));
-app.use("/api/activity-logs", require("./routes/activityLog.routes"));
+app.use("/auth", require("./routes/auth.routes"));
+app.use("/assets", require("./routes/asset.routes"));
+app.use("/departments", require("./routes/department.routes"));
+app.use("/categories", require("./routes/category.routes"));
+app.use("/users", require("./routes/user.routes"));
+app.use("/allocations", require("./routes/allocation.routes"));
+app.use("/bookings", require("./routes/booking.routes"));
+app.use("/maintenance", require("./routes/maintenance.routes"));
+app.use("/transfers", require("./routes/transfer.routes"));
+app.use("/notifications", require("./routes/notification.routes"));
+app.use("/audits", require("./routes/audit.routes"));
+app.use("/activity-logs", require("./routes/activityLog.routes"));
 
-app.get("/api/health", (_req, res) => {
+app.get("/health", (_req, res) => {
   res.json({ status: "ok", db: "connected" });
 });
 

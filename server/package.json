@@ -15,6 +15,7 @@
     "express": "*",
     "jsonwebtoken": "*",
     "mongoose": "*",
-    "morgan": "*"
+    "morgan": "*",
+    "socket.io": "^4.8.3"
   }
 }

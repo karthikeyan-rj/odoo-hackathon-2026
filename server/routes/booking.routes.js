@@ -59,8 +59,18 @@ router.get('/', async (req, res, next) => {
 // ── PATCH /api/bookings/:id/cancel ────────────────────────────────────────────
 router.patch('/:id/cancel', async (req, res, next) => {
   try {
-    const booking = await cancelBooking(req.params.id);
-    return res.status(200).json({ success: true, data: booking, message: 'Booking cancelled.' });
+    const booking = await Booking.findById(req.params.id);
+    if (!booking) {
+      return res.status(404).json({ success: false, data: null, message: 'Booking not found.' });
+    }
+
+    const isAdmin = ['Admin', 'AssetManager'].includes(req.user.role);
+    if (!isAdmin && booking.requestedBy.toString() !== req.user._id.toString()) {
+      return res.status(403).json({ success: false, data: null, message: 'You do not have permission to cancel this booking.' });
+    }
+
+    const cancelledBooking = await cancelBooking(req.params.id);
+    return res.status(200).json({ success: true, data: cancelledBooking, message: 'Booking cancelled.' });
   } catch (err) {
     if (err.statusCode === 404) {
       return res.status(404).json({ success: false, data: null, message: err.message });

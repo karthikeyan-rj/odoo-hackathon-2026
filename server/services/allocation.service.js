@@ -1,5 +1,10 @@
 
 const Asset = require('../models/Asset');
+const socketStore = require('../config/socket');
+
+const emitSafe = (event, data) => {
+  try { socketStore.getIO().to('broadcast').emit(event, data); } catch (_) {}
+};
 const Allocation = require('../models/Allocation');
 const TransferRequest = require('../models/TransferRequest');
 const { ASSET_STATUS, ALLOCATION_STATUS, TRANSFER_STATUS } = require('../constants/enums');
@@ -65,6 +70,7 @@ const allocateAsset = async ({ assetId, assigneeType, assigneeId, allocatedBy, e
     }).catch(() => {});
   }
 
+  emitSafe('allocation:created', { allocation });
   return allocation;
 };
 
@@ -85,7 +91,7 @@ const returnAsset = async ({ allocationId, conditionNotes, returnedBy }) => {
   await allocation.save();
 
   await Asset.findByIdAndUpdate(allocation.asset, { status: ASSET_STATUS.AVAILABLE });
-
+  emitSafe('allocation:returned', { allocationId: allocation._id, assetId: allocation.asset });
   return allocation;
 };
 
@@ -107,6 +113,7 @@ const createTransferRequest = async ({ assetId, requestedBy, targetType, targetI
     { path: 'requestedBy', select: 'name email' },
   ]);
 
+  emitSafe('transfer:requested', { transferRequest });
   return transferRequest;
 };
 
@@ -165,6 +172,7 @@ const approveTransfer = async ({ transferRequestId, approvedBy }) => {
     }).catch(() => {});
   }
 
+  emitSafe('transfer:approved', { result });
   return result;
 };
 
@@ -184,6 +192,7 @@ const rejectTransfer = async ({ transferRequestId, reviewedBy }) => {
     throw err;
   }
 
+  emitSafe('transfer:rejected', { transferRequest });
   return transferRequest;
 };
 

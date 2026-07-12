@@ -32,7 +32,7 @@ router.patch(
   async (req, res, next) => {
     try {
       const { role } = req.body;
-      const allowedPromotions = [ROLES.DEPARTMENT_HEAD, ROLES.ASSET_MANAGER, ROLES.ADMIN];
+      const allowedPromotions = [ROLES.EMPLOYEE, ROLES.DEPARTMENT_HEAD, ROLES.ASSET_MANAGER, ROLES.ADMIN];
       if (!role || !allowedPromotions.includes(role)) {
         return res.status(400).json({
           success: false,

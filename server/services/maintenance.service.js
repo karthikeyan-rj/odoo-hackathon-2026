@@ -3,6 +3,11 @@ const Asset = require('../models/Asset');
 const { MAINTENANCE_STATUS, ASSET_STATUS } = require('../constants/enums');
 const { notify } = require('./notification.service');
 const { NOTIFICATION_TYPE, ENTITY_TYPE } = require('../constants/enums');
+const socketStore = require('../config/socket');
+
+const emitSafe = (event, data) => {
+  try { socketStore.getIO().to('broadcast').emit(event, data); } catch (_) {}
+};
 
 const raiseRequest = async ({ assetId, raisedBy, description, priority, attachmentUrl }) => {
   const request = await MaintenanceRequest.create({
@@ -44,6 +49,7 @@ const approveRequest = async ({ requestId, approvedBy }) => {
     entityId: request._id,
   }).catch(() => {});
 
+  emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.APPROVED });
   return request;
 };
 
@@ -68,6 +74,7 @@ const rejectRequest = async ({ requestId, approvedBy }) => {
     entityId: request._id,
   }).catch(() => {});
 
+  emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.REJECTED });
   return request;
 };
 
@@ -83,6 +90,7 @@ const assignTechnician = async ({ requestId, technicianName }) => {
     err.statusCode = 404;
     throw err;
   }
+  emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.TECHNICIAN_ASSIGNED });
   return request;
 };
 
@@ -98,6 +106,7 @@ const markInProgress = async ({ requestId }) => {
     err.statusCode = 404;
     throw err;
   }
+  emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.IN_PROGRESS });
   return request;
 };
 
@@ -121,6 +130,7 @@ const resolveRequest = async ({ requestId }) => {
     await Asset.findByIdAndUpdate(request.asset._id, { status: ASSET_STATUS.AVAILABLE });
   }
 
+  emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.RESOLVED });
   return request;
 };
 

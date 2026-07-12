@@ -3,6 +3,11 @@ const Asset = require('../models/Asset');
 const { BOOKING_STATUS } = require('../constants/enums');
 const { notify } = require('./notification.service');
 const { NOTIFICATION_TYPE, ENTITY_TYPE } = require('../constants/enums');
+const socketStore = require('../config/socket');
+
+const emitSafe = (event, data) => {
+  try { socketStore.getIO().to('broadcast').emit(event, data); } catch (_) {}
+};
 
 /**
  * checkOverlap — returns true if any booking overlaps the given time window
@@ -70,6 +75,7 @@ const createBooking = async ({ resourceId, requestedBy, startTime, endTime, purp
     entityId: booking._id,
   }).catch(() => {});
 
+  emitSafe('booking:created', { booking });
   return booking;
 };
 
@@ -97,6 +103,7 @@ const cancelBooking = async (bookingId) => {
     entityId: booking._id,
   }).catch(() => {});
 
+  emitSafe('booking:cancelled', { bookingId: booking._id });
   return booking;
 };
 

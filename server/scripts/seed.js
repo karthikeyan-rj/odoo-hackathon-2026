@@ -153,6 +153,76 @@ async function seed() {
   console.log(`Asset  → ${laptop.name} [${laptop.assetTag}]`);
   console.log(`Asset  → ${projector.name} [${projector.assetTag}]`);
 
+  // Seed Users
+  const employee = await User.findOneAndUpdate(
+    { email: "john@assetflow.local" },
+    {
+      $setOnInsert: {
+        name: "John Employee",
+        email: "john@assetflow.local",
+        passwordHash,
+        role: "Employee",
+        status: "Active",
+        department: itDept._id,
+      }
+    },
+    { upsert: true, new: true }
+  );
+
+  const manager = await User.findOneAndUpdate(
+    { email: "manager@assetflow.local" },
+    {
+      $setOnInsert: {
+        name: "Asset Manager",
+        email: "manager@assetflow.local",
+        passwordHash,
+        role: "AssetManager",
+        status: "Active",
+        department: itDept._id,
+      }
+    },
+    { upsert: true, new: true }
+  );
+
+  const deptHead = await User.findOneAndUpdate(
+    { email: "depthead@assetflow.local" },
+    {
+      $setOnInsert: {
+        name: "Department Head",
+        email: "depthead@assetflow.local",
+        passwordHash,
+        role: "DepartmentHead",
+        status: "Active",
+        department: hrDept._id,
+      }
+    },
+    { upsert: true, new: true }
+  );
+
+  console.log(`Employee → ${employee.email}`);
+  console.log(`Manager  → ${manager.email}`);
+  console.log(`DeptHead → ${deptHead.email}`);
+
+  // Seed active allocation of Dell laptop to John
+  const Allocation = require("../models/Allocation");
+  await Allocation.findOneAndUpdate(
+    { asset: laptop._id, status: "Active" },
+    {
+      $setOnInsert: {
+        asset: laptop._id,
+        assigneeType: "User",
+        assigneeUser: employee._id,
+        allocatedBy: admin._id,
+        allocatedAt: new Date(),
+        status: "Active",
+      }
+    },
+    { upsert: true }
+  );
+
+  // Update laptop status to Allocated in Asset collection
+  await Asset.findByIdAndUpdate(laptop._id, { status: "Allocated" });
+
   console.log("\nSeed complete ✓");
 }
 

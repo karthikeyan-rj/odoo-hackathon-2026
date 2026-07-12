@@ -9,7 +9,7 @@ router.get("/", authMiddleware, async (req, res) => {
     const notifications = await Notification.find({ user: req.user._id })
       .sort({ createdAt: -1 })
       .limit(50);
-    return res.status(200).json(notifications);
+    return res.status(200).json(notifications.map((n) => ({ ...n.toObject(), isRead: Boolean(n.readAt) })));
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error", message: error.message });
   }
@@ -26,7 +26,7 @@ router.put("/:id/read", authMiddleware, async (req, res) => {
     notification.readAt = new Date();
     await notification.save();
 
-    return res.status(200).json(notification);
+    return res.status(200).json({ ...notification.toObject(), isRead: true });
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error", message: error.message });
   }

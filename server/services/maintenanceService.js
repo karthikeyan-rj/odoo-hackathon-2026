@@ -29,6 +29,16 @@ async function updateMaintenanceStatus({
     throw new Error("Maintenance request not found");
   }
 
+  const allowedTransitions = {
+    Pending: ["Approved", "Rejected"],
+    Approved: ["TechnicianAssigned", "InProgress"],
+    TechnicianAssigned: ["InProgress"],
+    InProgress: ["Resolved"],
+  };
+  if (!(allowedTransitions[request.status] || []).includes(newStatus)) {
+    throw new Error(`Cannot move maintenance from ${request.status} to ${newStatus}`);
+  }
+
   request.status = newStatus;
 
   if (newStatus === "Approved" && approvedBy) {

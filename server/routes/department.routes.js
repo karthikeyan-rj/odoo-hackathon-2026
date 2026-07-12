@@ -1,9 +1,10 @@
 const express = require("express");
 const router = express.Router();
 const Department = require("../models/Department");
+const authMiddleware = require("../middleware/auth.middleware");
 
 // GET /api/departments - List all departments
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const depts = await Department.find().populate("head").populate("parentDepartment");
     return res.status(200).json(depts);
@@ -13,15 +14,16 @@ router.get("/", async (req, res) => {
 });
 
 // POST /api/departments - Create a department
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
-    const { name, parentDepartment, status } = req.body;
+    const { name, head, parentDepartment, status } = req.body;
     if (!name) {
       return res.status(400).json({ error: "Department name is required" });
     }
 
     const dept = new Department({
       name,
+      head: head || null,
       parentDepartment: parentDepartment || null,
       status: status || "Active",
     });
@@ -37,7 +39,7 @@ router.post("/", async (req, res) => {
 });
 
 // PUT /api/departments/:id - Update department
-router.put("/:id", async (req, res) => {
+router.put("/:id", authMiddleware, async (req, res) => {
   try {
     const { name, head, parentDepartment, status } = req.body;
     const dept = await Department.findById(req.params.id);

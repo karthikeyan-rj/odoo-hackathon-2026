@@ -29,6 +29,8 @@ import DepartmentView from "./DepartmentView";
 
 // Shared
 import Notifications from "./Notifications";
+import Reports from "./Reports";
+import ActivityLogs from "./ActivityLogs";
 
 // Route guard — same mechanism as before
 function Guard(props) {
@@ -75,6 +77,8 @@ export default function App() {
 
           {/* Shared */}
           <Route path="notifications" element={<Notifications />} />
+          <Route path="reports" element={<Reports />} />
+          <Route path="activity-logs" element={<ActivityLogs />} />
 
           {/* Catch-all */}
           <Route path="*" element={<Navigate to="/dashboard" replace />} />

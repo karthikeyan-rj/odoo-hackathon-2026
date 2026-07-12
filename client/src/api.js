@@ -34,6 +34,10 @@ export function createBooking(data) {
   return api.post('/api/bookings', data);
 }
 
+export function cancelBooking(id) {
+  return api.put(`/api/bookings/${id}/cancel`);
+}
+
 export function getBookableAssets() {
   return api.get('/api/assets', { params: { isBookable: true, status: 'Available' } });
 }
@@ -86,6 +90,17 @@ export function approveMaintenance(id, technicianName) {
   return api.put(`/api/maintenance/${id}/approve`, { technicianName });
 }
 
+export function assignMaintenance(id, technicianName) {
+  return api.put(`/api/maintenance/${id}/assign`, { technicianName });
+}
+
+export function resolveMaintenance(id) {
+  return api.put(`/api/maintenance/${id}/resolve`);
+}
+export function startMaintenance(id) {
+  return api.put(`/api/maintenance/${id}/start`);
+}
+
 export function rejectMaintenance(id) {
   return api.put(`/api/maintenance/${id}/reject`);
 }
@@ -98,9 +113,11 @@ export function updateDepartment(id, data) { return api.put(`/api/departments/${
 // Categories
 export function getAssetCategories() { return api.get('/api/categories'); }
 export function createAssetCategory(data) { return api.post('/api/categories', data); }
+export function updateAssetCategory(id, data) { return api.put(`/api/categories/${id}`, data); }
 
 // Users
 export function getUsers() { return api.get('/api/users'); }
+export function updateUser(id, data) { return api.put(`/api/users/${id}`, data); }
 export function promoteUser(id, role) { return api.put(`/api/users/${id}/role`, { role }); }
 
 // Notifications

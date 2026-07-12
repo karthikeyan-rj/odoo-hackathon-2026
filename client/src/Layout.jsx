@@ -16,7 +16,8 @@ function Layout() {
       { label: "Maintenance Approvals", path: "/maintenance-approvals" },
       { label: "Org Setup",             path: "/org-setup" },
       { label: "Asset Audits",          path: "/audits" },
-      { label: "Notifications",         path: "/notifications" }
+      { label: "Notifications",         path: "/notifications" },
+      { label: "Reports",               path: "/reports" }
     ];
   } else if (user.role === "AssetManager") {
     navLinks = [
@@ -25,14 +26,17 @@ function Layout() {
       { label: "Allocation Manager",    path: "/allocations" },
       { label: "Maintenance Approvals", path: "/maintenance-approvals" },
       { label: "Asset Audits",          path: "/audits" },
-      { label: "Notifications",         path: "/notifications" }
+      { label: "Notifications",         path: "/notifications" },
+      { label: "Reports",               path: "/reports" }
     ];
   } else if (user.role === "DepartmentHead") {
     navLinks = [
       { label: "Dashboard",        path: "/dashboard" },
       { label: "Department View",  path: "/department-view" },
       { label: "Book Resource",    path: "/book-resource" },
-      { label: "Notifications",    path: "/notifications" }
+      { label: "Notifications",    path: "/notifications" },
+      { label: "Reports",          path: "/reports" },
+      { label: "Activity Logs",    path: "/activity-logs" }
     ];
   } else {
     // Employee
@@ -41,7 +45,9 @@ function Layout() {
       { label: "My Assets",     path: "/my-assets" },
       { label: "Book Resource", path: "/book-resource" },
       { label: "Maintenance",   path: "/maintenance" },
-      { label: "Notifications", path: "/notifications" }
+      { label: "Notifications", path: "/notifications" },
+      { label: "Reports",       path: "/reports" },
+      { label: "Activity Logs", path: "/activity-logs" }
     ];
   }
 

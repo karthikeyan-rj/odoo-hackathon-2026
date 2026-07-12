@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getAssetCategories, createAssetCategory } from "../api";
+import { getAssetCategories, createAssetCategory, updateAssetCategory } from "../api";
 
 const FIELD_TYPES = ["String", "Number", "Boolean", "Date"];
 
@@ -8,7 +8,10 @@ export default function CatTab() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
   const [showForm, setShowForm] = useState(false);
+  const [editId, setEditId] = useState(null);
   const [name, setName] = useState("");
+  const [description, setDescription] = useState("");
+  const [status, setStatus] = useState("Active");
   const [fields, setFields] = useState([{ key: "", type: "String", required: false }]);
 
   const load = () => {
@@ -22,12 +25,35 @@ export default function CatTab() {
   const removeField = (i) => setFields(fields.filter((_, idx) => idx !== i));
   const updateField = (i, key, val) => setFields(fields.map((f, idx) => idx === i ? { ...f, [key]: val } : f));
 
+  const resetForm = () => {
+    setShowForm(false);
+    setEditId(null);
+    setName("");
+    setDescription("");
+    setStatus("Active");
+    setFields([{ key: "", type: "String", required: false }]);
+  };
+
+  const openEdit = (category) => {
+    setEditId(category._id);
+    setName(category.name || "");
+    setDescription(category.description || "");
+    setStatus(category.status || "Active");
+    setFields((category.customFields || []).length ? category.customFields : [{ key: "", type: "String", required: false }]);
+    setShowForm(true);
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
     try {
-      await createAssetCategory({ name, customFields: fields.filter(f => f.key.trim()) });
-      setName(""); setFields([{ key: "", type: "String", required: false }]); setShowForm(false); load();
-    } catch (err) { setError(err.response?.data?.error || "Create failed."); }
+      const payload = { name, description, status, customFields: fields.filter(f => f.key.trim()) };
+      if (editId) {
+        await updateAssetCategory(editId, payload);
+      } else {
+        await createAssetCategory(payload);
+      }
+      resetForm(); load();
+    } catch (err) { setError(err.response?.data?.error || "Save failed."); }
   };
 
   const inp = "p-2 border border-zinc-200 rounded bg-white text-xs";
@@ -38,7 +64,7 @@ export default function CatTab() {
     <div className="space-y-4">
       {error && <div className="p-2.5 bg-red-50 border border-red-200 text-red-700 rounded text-xs flex justify-between">{error}<button onClick={() => setError("")} className="font-bold">×</button></div>}
       <div className="flex justify-end">
-        <button onClick={() => setShowForm(!showForm)} className="px-3 py-1.5 bg-zinc-900 text-white rounded text-xs font-medium hover:bg-zinc-700">
+        <button onClick={() => (showForm ? resetForm() : setShowForm(true))} className="px-3 py-1.5 bg-zinc-900 text-white rounded text-xs font-medium hover:bg-zinc-700">
           {showForm ? "Cancel" : "+ Add Category"}
         </button>
       </div>
@@ -46,6 +72,11 @@ export default function CatTab() {
       {showForm && (
         <form onSubmit={handleSubmit} className="bg-zinc-50 border border-zinc-200 rounded p-4 space-y-3">
           <input required placeholder="Category name" className={`w-full ${inp}`} value={name} onChange={e => setName(e.target.value)} />
+          <input placeholder="Short description" className={`w-full ${inp}`} value={description} onChange={e => setDescription(e.target.value)} />
+          <select className={`w-full ${inp}`} value={status} onChange={e => setStatus(e.target.value)}>
+            <option value="Active">Active</option>
+            <option value="Inactive">Inactive</option>
+          </select>
           <div className="space-y-2">
             <div className="text-[10px] text-zinc-500 uppercase font-semibold">Custom Fields</div>
             {fields.map((f, i) => (
@@ -72,14 +103,15 @@ export default function CatTab() {
         <div className="bg-white border border-zinc-200 rounded overflow-hidden">
           <table className="w-full text-xs">
             <thead className="bg-zinc-50 border-b border-zinc-200 text-[10px] uppercase text-zinc-500 font-semibold">
-              <tr><th className="px-4 py-2.5 text-left">Name</th><th className="px-4 py-2.5 text-left">Custom Fields</th><th className="px-4 py-2.5 text-left">Created</th></tr>
+              <tr><th className="px-4 py-2.5 text-left">Name</th><th className="px-4 py-2.5 text-left">Custom Fields</th><th className="px-4 py-2.5 text-left">Status</th><th className="px-4 py-2.5 text-right">Actions</th></tr>
             </thead>
             <tbody className="divide-y divide-zinc-100">
               {cats.map(c => (
                 <tr key={c._id} className="hover:bg-zinc-50">
                   <td className="px-4 py-2.5 font-medium text-zinc-900">{c.name}</td>
                   <td className="px-4 py-2.5 text-zinc-600">{c.customFields?.length || 0} fields</td>
-                  <td className="px-4 py-2.5 text-zinc-400">{new Date(c.createdAt).toLocaleDateString()}</td>
+                  <td className="px-4 py-2.5 text-zinc-600">{c.status}</td>
+                  <td className="px-4 py-2.5 text-right"><button onClick={() => openEdit(c)} className="px-2 py-1 border border-zinc-200 rounded hover:bg-zinc-100">Edit</button></td>
                 </tr>
               ))}
             </tbody>

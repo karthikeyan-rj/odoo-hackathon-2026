@@ -1,9 +1,11 @@
 import React, { useState, useEffect } from "react";
+import { useLocation } from "react-router-dom";
 import api, { getAssets, createAsset, getAssetHistory } from "./api";
 import StatusBadge from "./StatusBadge";
 import { ASSET_CONDITIONS, ASSET_STATUSES } from "./constants";
 
 export default function AssetDirectory() {
+  const location = useLocation();
   const [assets, setAssets] = useState([]);
   const [categories, setCategories] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -24,7 +26,15 @@ export default function AssetDirectory() {
     ]).catch(() => setMsg("Failed to load assets.")).finally(() => setLoading(false));
   };
 
-  useEffect(() => { loadAssets(); }, [filterStatus, filterCategory]);
+  useEffect(() => {
+    loadAssets();
+  }, [filterStatus, filterCategory]);
+
+  useEffect(() => {
+    if (location.state?.openForm) {
+      setShowForm(true);
+    }
+  }, [location.state]);
 
   const handleRowClick = async (id) => {
     if (expandedId === id) { setExpandedId(null); return; }

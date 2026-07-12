@@ -1,25 +1,47 @@
 import React, { useState, useEffect } from "react";
-import { getUsers, promoteUser } from "../api";
+import { getUsers, promoteUser, updateUser, getDepartments } from "../api";
 import StatusBadge from "../StatusBadge";
-import { USER_ROLES } from "../constants";
+import { USER_ROLES, ACTIVE_STATUS } from "../constants";
 
 export default function UsersTab() {
   const [users, setUsers] = useState([]);
+  const [departments, setDepartments] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
 
   const load = () => {
     setLoading(true);
-    getUsers().then(r => setUsers(r.data || [])).catch(() => setError("Failed to load users.")).finally(() => setLoading(false));
+    Promise.all([
+      getUsers().then(r => setUsers(r.data || [])),
+      getDepartments().then(r => setDepartments(r.data || []))
+    ]).catch(() => setError("Failed to load users.")).finally(() => setLoading(false));
   };
 
   useEffect(() => { load(); }, []);
 
+  const updateLocalUser = (id, updates) => {
+    setUsers(prev => prev.map(u => u._id === id ? { ...u, ...updates } : u));
+  };
+
   const handlePromote = async (id, role) => {
     try {
       await promoteUser(id, role);
-      setUsers(prev => prev.map(u => u._id === id ? { ...u, role } : u));
+      updateLocalUser(id, { role });
     } catch (err) { setError(err.response?.data?.error || "Promote failed."); }
+  };
+
+  const handleStatusChange = async (id, status) => {
+    try {
+      await updateUser(id, { status });
+      updateLocalUser(id, { status });
+    } catch (err) { setError(err.response?.data?.error || "Status update failed."); }
+  };
+
+  const handleDepartmentChange = async (id, department) => {
+    try {
+      await updateUser(id, { department });
+      updateLocalUser(id, { department: departments.find(d => d._id === department) || null });
+    } catch (err) { setError(err.response?.data?.error || "Department update failed."); }
   };
 
   if (loading) return <div className="text-xs text-zinc-500 p-4">Loading users...</div>;
@@ -43,6 +65,7 @@ export default function UsersTab() {
                 <th className="px-4 py-2.5 text-left">Email</th>
                 <th className="px-4 py-2.5 text-left">Role</th>
                 <th className="px-4 py-2.5 text-left">Department</th>
+                <th className="px-4 py-2.5 text-left">Status</th>
                 <th className="px-4 py-2.5 text-left">Assign Role</th>
               </tr>
             </thead>
@@ -52,7 +75,25 @@ export default function UsersTab() {
                   <td className="px-4 py-2.5 font-medium text-zinc-900">{u.name}</td>
                   <td className="px-4 py-2.5 text-zinc-500">{u.email}</td>
                   <td className="px-4 py-2.5"><StatusBadge value={u.role} /></td>
-                  <td className="px-4 py-2.5 text-zinc-600">{u.department?.name || "—"}</td>
+                  <td className="px-4 py-2.5">
+                    <select
+                      className="p-1.5 border border-zinc-200 rounded bg-white text-xs"
+                      value={u.department?._id || ""}
+                      onChange={e => handleDepartmentChange(u._id, e.target.value)}
+                    >
+                      <option value="">No department</option>
+                      {departments.map(d => <option key={d._id} value={d._id}>{d.name}</option>)}
+                    </select>
+                  </td>
+                  <td className="px-4 py-2.5">
+                    <select
+                      className="p-1.5 border border-zinc-200 rounded bg-white text-xs"
+                      value={u.status || "Active"}
+                      onChange={e => handleStatusChange(u._id, e.target.value)}
+                    >
+                      {ACTIVE_STATUS.map(s => <option key={s}>{s}</option>)}
+                    </select>
+                  </td>
                   <td className="px-4 py-2.5">
                     <select
                       className="p-1.5 border border-zinc-200 rounded bg-white text-xs"

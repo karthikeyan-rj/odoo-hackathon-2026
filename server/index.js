@@ -44,6 +44,7 @@ async function start() {
   });
 
   // Mount API Routes
+  app.use("/api/auth", require("./routes/auth.routes"));
   app.use("/api/assets", require("./routes/asset.routes"));
   app.use("/api/departments", require("./routes/department.routes"));
   app.use("/api/categories", require("./routes/category.routes"));

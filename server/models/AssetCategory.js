@@ -5,6 +5,15 @@ const assetCategorySchema = new mongoose.Schema(
   {
     name: { type: String, required: true, unique: true, trim: true },
     description: { type: String, trim: true },
+    customFields: {
+      type: [{
+        key: { type: String, trim: true },
+        label: { type: String, trim: true },
+        type: { type: String, trim: true },
+        required: { type: Boolean, default: false },
+      }],
+      default: [],
+    },
     status: {
       type: String,
       enum: Object.values(ASSET_CATEGORY_STATUS),

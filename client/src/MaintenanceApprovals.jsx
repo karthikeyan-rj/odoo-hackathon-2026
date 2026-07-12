@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from "react";
-import { getPendingMaintenance, approveMaintenance, rejectMaintenance } from "./api";
+import { getMaintenanceRequests, approveMaintenance, rejectMaintenance, assignMaintenance, startMaintenance, resolveMaintenance } from "./api";
 import StatusBadge from "./StatusBadge";
 
 export default function MaintenanceApprovals() {
@@ -11,7 +11,7 @@ export default function MaintenanceApprovals() {
 
   const load = () => {
     setLoading(true);
-    getPendingMaintenance()
+    getMaintenanceRequests()
       .then(r => setRequests(r.data || []))
       .catch(() => setError("Failed to load maintenance requests."))
       .finally(() => setLoading(false));
@@ -32,6 +32,15 @@ export default function MaintenanceApprovals() {
     } catch (err) { setError(err.response?.data?.error || "Reject failed."); }
   };
 
+  const progress = async (request) => {
+    try {
+      if (request.status === "Approved") await assignMaintenance(request._id, request.technicianName || "Assigned technician");
+      else if (request.status === "TechnicianAssigned") await startMaintenance(request._id);
+      else if (request.status === "InProgress") await resolveMaintenance(request._id);
+      load();
+    } catch (err) { setError(err.response?.data?.message || "Unable to update maintenance status."); }
+  };
+
   if (loading) return <div className="text-xs text-zinc-500">Loading maintenance requests...</div>;
 
   return (
@@ -45,7 +54,7 @@ export default function MaintenanceApprovals() {
       )}
 
       {requests.length === 0 ? (
-        <div className="p-4 bg-white border border-zinc-200 rounded text-xs text-zinc-400">No pending maintenance requests.</div>
+        <div className="p-4 bg-white border border-zinc-200 rounded text-xs text-zinc-400">No maintenance requests.</div>
       ) : (
         <div className="bg-white border border-zinc-200 rounded overflow-hidden">
           <table className="w-full text-xs">
@@ -73,18 +82,8 @@ export default function MaintenanceApprovals() {
                     <td className="px-4 py-2.5 text-zinc-600">{r.raisedBy?.name || "—"}</td>
                     <td className="px-4 py-2.5 text-zinc-400">{new Date(r.createdAt).toLocaleDateString()}</td>
                     <td className="px-4 py-2.5 text-right space-x-2">
-                      <button
-                        onClick={() => { setApproveId(approveId === r._id ? null : r._id); setTechName(""); }}
-                        className="px-2 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700"
-                      >
-                        Approve
-                      </button>
-                      <button
-                        onClick={() => handleReject(r._id)}
-                        className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700"
-                      >
-                        Reject
-                      </button>
+                      {r.status === "Pending" && <><button onClick={() => { setApproveId(approveId === r._id ? null : r._id); setTechName(""); }} className="px-2 py-1 bg-emerald-600 text-white rounded hover:bg-emerald-700">Approve</button><button onClick={() => handleReject(r._id)} className="px-2 py-1 bg-red-600 text-white rounded hover:bg-red-700">Reject</button></>}
+                      {["Approved", "TechnicianAssigned", "InProgress"].includes(r.status) && <button onClick={() => progress(r)} className="px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700">{r.status === "Approved" ? "Assign" : r.status === "TechnicianAssigned" ? "Start" : "Resolve"}</button>}
                     </td>
                   </tr>
                   {approveId === r._id && (

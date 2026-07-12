@@ -6,6 +6,7 @@ const assetSchema = new mongoose.Schema(
     assetTag: { type: String, required: true, unique: true, trim: true },
     name: { type: String, required: true, trim: true },
     serialNumber: { type: String, trim: true },
+    condition: { type: String, trim: true, default: "Good" },
     category: {
       type: mongoose.Schema.Types.ObjectId,
       ref: 'AssetCategory',

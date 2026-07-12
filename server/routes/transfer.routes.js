@@ -3,6 +3,7 @@ const router = express.Router();
 const TransferRequest = require("../models/TransferRequest");
 const authMiddleware = require("../middleware/auth.middleware");
 const { approveTransfer } = require("../services/allocationService");
+const { createNotification } = require("../services/notification.service");
 
 // GET /api/transfers - List transfers
 router.get("/", authMiddleware, async (req, res) => {
@@ -86,6 +87,7 @@ router.put("/:id/approve", authMiddleware, async (req, res) => {
     transferRequest.reviewedBy = req.user._id;
     transferRequest.reviewedAt = new Date();
     await transferRequest.save();
+    if (transferRequest.targetUser) await createNotification({ userId: transferRequest.targetUser, type: "Transfer Approved", message: "An asset transfer to you was approved.", entityType: "TransferRequest", entityId: transferRequest._id });
 
     return res.status(200).json(transferRequest);
   } catch (error) {
@@ -105,6 +107,7 @@ router.put("/:id/reject", authMiddleware, async (req, res) => {
     transferRequest.reviewedBy = req.user._id;
     transferRequest.reviewedAt = new Date();
     await transferRequest.save();
+    await createNotification({ userId: transferRequest.requestedBy, type: "Transfer Rejected", message: "Your asset transfer request was rejected.", entityType: "TransferRequest", entityId: transferRequest._id });
 
     return res.status(200).json(transferRequest);
   } catch (error) {

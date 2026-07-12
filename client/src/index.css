@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --font-sans: "Inter", system-ui, -apple-system, sans-serif;
+}
+
+body {
+  margin: 0;
+  font-family: var(--font-sans);
+  background-color: #f9f9fb;
+  color: #18181b;
+}
+
+/* Custom scrollbar for enterprise look */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: transparent;
+}
+::-webkit-scrollbar-thumb {
+  background: #e4e4e7;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #d4d4d8;
+}

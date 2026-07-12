@@ -62,7 +62,7 @@ bookingSchema.pre("validate", function validateTime(next) {
     this.endTime <= this.startTime
   ) {
     return next(
-      new Error("Booking endTime must be after startTime")
+      new Error("End time must be after start time")
     );
   }
 

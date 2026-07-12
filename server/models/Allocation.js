@@ -93,7 +93,7 @@ allocationSchema.pre("validate", function validateAssignee(next) {
   next();
 });
 
-// Partial unique index — only one Active allocation per asset at a time.
+// Only one active allocation is allowed for an asset.
 allocationSchema.index(
   { asset: 1 },
   {

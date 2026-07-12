@@ -72,7 +72,7 @@ auditCycleSchema.pre(
       this.endDate < this.startDate
     ) {
       return next(
-        new Error("Audit endDate cannot be before startDate")
+        new Error("End date cannot be before start date")
       );
     }
 

@@ -30,6 +30,7 @@ const userSchema = new mongoose.Schema(
     role: {
       type: String,
       enum: USER_ROLES,
+      // New users are always created as employees.
       default: "Employee",
     },
 
@@ -61,7 +62,7 @@ const userSchema = new mongoose.Schema(
   }
 );
 
-// unique email index is created automatically by { unique: true } on the field
+
 userSchema.index({ department: 1 });
 userSchema.index({ role: 1, status: 1 });
 

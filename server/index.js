@@ -53,6 +53,7 @@ async function start() {
   app.use("/api/maintenance", require("./routes/maintenance.routes"));
   app.use("/api/transfers", require("./routes/transfer.routes"));
   app.use("/api/notifications", require("./routes/notification.routes"));
+  app.use("/api/audits", require("./routes/audit.routes"));
 
   // Health-check endpoint
   app.get("/api/health", (_req, res) => {

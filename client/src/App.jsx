@@ -22,6 +22,7 @@ import MaintenanceApprovals from "./MaintenanceApprovals";
 
 // Admin only
 import OrgSetup from "./OrgSetup";
+import AssetAudits from "./AssetAudits";
 
 // Department Head
 import DepartmentView from "./DepartmentView";
@@ -67,6 +68,7 @@ export default function App() {
 
           {/* Admin only */}
           <Route path="org-setup" element={<OrgSetup />} />
+          <Route path="audits"    element={<AssetAudits />} />
 
           {/* Department Head */}
           <Route path="department-view" element={<DepartmentView />} />

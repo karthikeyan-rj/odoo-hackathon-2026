@@ -72,6 +72,21 @@ const AUDIT_RESULTS = [
   "Damaged",
 ];
 
+const ASSET_STATUS = {
+  AVAILABLE: "Available",
+  ALLOCATED: "Allocated",
+  RESERVED: "Reserved",
+  UNDER_MAINTENANCE: "UnderMaintenance",
+  LOST: "Lost",
+  RETIRED: "Retired",
+  DISPOSED: "Disposed",
+};
+
+const ASSET_CATEGORY_STATUS = {
+  ACTIVE: "Active",
+  INACTIVE: "Inactive",
+};
+
 module.exports = {
   USER_ROLES,
   ACTIVE_STATUS,
@@ -84,4 +99,6 @@ module.exports = {
   MAINTENANCE_STATUSES,
   AUDIT_STATUSES,
   AUDIT_RESULTS,
+  ASSET_STATUS,
+  ASSET_CATEGORY_STATUS,
 };

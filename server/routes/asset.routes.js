@@ -62,13 +62,17 @@ router.post("/", async (req, res) => {
 // GET /api/assets - Retrieve assets with search and filters
 router.get("/", async (req, res) => {
   try {
-    const { search, category, status, department, location } = req.query;
+    const { search, category, status, department, location, isBookable } = req.query;
     const filter = {};
 
     if (category) filter.category = category;
     if (status) filter.status = status;
     if (department) filter.department = department;
     if (location) filter.location = { $regex: location, $options: "i" };
+    
+    if (isBookable !== undefined) {
+      filter.isBookable = isBookable === "true" || isBookable === true;
+    }
 
     if (search) {
       filter.$or = [

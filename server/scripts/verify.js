@@ -1,22 +1,3 @@
-/**
- * Verification script — tests the database foundation.
- *
- * Checks:
- *  1. MongoDB connection
- *  2. Seed script ran correctly
- *  3. Indexes exist
- *  4. Duplicate email is rejected
- *  5. Duplicate assetTag is rejected
- *  6. Two Active allocations for the same asset are rejected
- *  7. Cancelled booking does not block a new booking
- *  8. Overlapping active booking is rejected by bookingService
- *  9. Allocation service works
- * 10. Maintenance service works
- *
- * Usage:
- *   node scripts/verify.js
- */
-
 require("dotenv").config();
 const mongoose = require("mongoose");
 const connectDB = require("../config/db");
@@ -50,14 +31,11 @@ async function run() {
   await connectDB();
   console.log("\n── Verification ────────────────────────────\n");
 
-  // 1. DB connection
   if (mongoose.connection.readyState === 1) {
     ok("MongoDB connected");
   } else {
     fail("MongoDB connected", "readyState=" + mongoose.connection.readyState);
   }
-
-  // 2. Seed data present
   const admin = await User.findOne({ role: "Admin" });
   admin ? ok("Admin user exists") : fail("Admin user exists", "not found");
 
@@ -76,7 +54,6 @@ async function run() {
     ? ok(`Assets seeded (${assets})`)
     : fail("Assets seeded", `only ${assets}`);
 
-  // 3. Check indexes
   const userIndexes = await User.collection.indexes();
   const emailIdx = userIndexes.find((i) => i.key && i.key.email === 1 && i.unique);
   emailIdx ? ok("Unique email index exists") : fail("Unique email index", "not found");
@@ -98,7 +75,6 @@ async function run() {
     ? ok("Partial unique active allocation index exists")
     : fail("Partial unique active allocation index", "not found");
 
-  // 4. Duplicate email rejected
   try {
     await User.create({
       name: "Duplicate",
@@ -112,7 +88,6 @@ async function run() {
       : fail("Duplicate email rejected", err.message);
   }
 
-  // 5. Duplicate assetTag rejected
   const existingAsset = await Asset.findOne();
   try {
     await Asset.create({
@@ -127,8 +102,6 @@ async function run() {
       : fail("Duplicate assetTag rejected", err.message);
   }
 
-  // 6. Two Active allocations for the same asset rejected
-  // First clean up any existing allocations from previous test runs
   await Allocation.deleteMany({ asset: existingAsset._id });
   await Asset.findByIdAndUpdate(existingAsset._id, { status: "Available" });
 
@@ -155,21 +128,17 @@ async function run() {
       : fail("Second Active allocation rejected", err.message);
   }
 
-  // Return the asset so we can continue testing
   await returnAsset({ assetId: existingAsset._id });
   ok("returnAsset service works");
 
-  // 7. Cancelled booking does not block a new booking
   const bookableAsset = await Asset.findOne({ isBookable: true });
 
   if (bookableAsset) {
-    // Clean up bookings from previous test runs
     await Booking.deleteMany({ resource: bookableAsset._id });
 
     const start1 = new Date("2026-08-01T09:00:00Z");
     const end1 = new Date("2026-08-01T11:00:00Z");
 
-    // Create a booking and cancel it
     const cancelledBooking = await Booking.create({
       resource: bookableAsset._id,
       requestedBy: admin._id,
@@ -177,8 +146,6 @@ async function run() {
       endTime: end1,
       status: "Cancelled",
     });
-
-    // Try to create a new booking in the same slot
     const newBooking = await createBooking({
       resourceId: bookableAsset._id,
       requestedBy: admin._id,
@@ -187,7 +154,6 @@ async function run() {
     });
     ok("Cancelled booking does not block new booking");
 
-    // 8. Overlapping active booking is rejected
     try {
       await createBooking({
         resourceId: bookableAsset._id,
@@ -201,8 +167,6 @@ async function run() {
         ? ok("Overlapping booking rejected by service")
         : fail("Overlapping booking rejected", err.message);
     }
-
-    // 8b. Back-to-back booking is allowed
     const backToBack = await createBooking({
       resourceId: bookableAsset._id,
       requestedBy: admin._id,
@@ -211,13 +175,10 @@ async function run() {
     });
     ok("Back-to-back booking allowed (starts when another ends)");
 
-    // Cleanup test bookings
     await Booking.deleteMany({ resource: bookableAsset._id });
   } else {
     fail("Booking tests", "no bookable asset found");
   }
-
-  // 9. Maintenance service
   const mReq = await MaintenanceRequest.create({
     asset: existingAsset._id,
     raisedBy: admin._id,
@@ -246,10 +207,8 @@ async function run() {
     ? ok("Maintenance resolved → Asset Available")
     : fail("Maintenance resolved", `status=${assetAfterResolve.status}`);
 
-  // Cleanup test maintenance
   await MaintenanceRequest.findByIdAndDelete(mReq._id);
 
-  // Summary
   console.log(`\n── Results: ${passed} passed, ${failed} failed ──\n`);
 
   if (failed > 0) {

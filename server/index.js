@@ -32,6 +32,9 @@ async function start() {
   const app = express();
   app.use(express.json());
 
+  const assetRoutes = require("./routes/asset.routes");
+  app.use("/api/assets", assetRoutes);
+
   // Health-check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", db: "connected" });

@@ -4,6 +4,7 @@ const Allocation = require("../models/Allocation");
 const Asset = require("../models/Asset");
 const authMiddleware = require("../middleware/auth.middleware");
 const { allocateAsset, returnAsset } = require("../services/allocationService");
+const { logActivity } = require("../services/activityLog.service");
 
 // GET /api/allocations - List allocations
 router.get("/", authMiddleware, async (req, res) => {
@@ -85,6 +86,16 @@ router.post("/", authMiddleware, async (req, res) => {
       expectedReturnDate: expectedReturnDate ? new Date(expectedReturnDate) : undefined,
     });
 
+    // Populate asset details for logs
+    const dbAsset = await Asset.findById(asset);
+    await logActivity({
+      actor: req.user._id,
+      action: "Asset Allocated",
+      entityType: "Allocation",
+      entityId: allocation._id,
+      details: { assetName: dbAsset?.name, tag: dbAsset?.assetTag, assigneeType }
+    });
+
     return res.status(201).json(allocation);
   } catch (error) {
     return res.status(500).json({ error: "Internal Server Error", message: error.message });
@@ -94,7 +105,7 @@ router.post("/", authMiddleware, async (req, res) => {
 // POST /api/allocations/:id/return - Return an asset
 router.post("/:id/return", authMiddleware, async (req, res) => {
   try {
-    const allocation = await Allocation.findById(req.params.id);
+    const allocation = await Allocation.findById(req.params.id).populate("asset");
     if (!allocation) {
       return res.status(404).json({ error: "Allocation record not found" });
     }
@@ -104,6 +115,14 @@ router.post("/:id/return", authMiddleware, async (req, res) => {
     const updatedAlloc = await returnAsset({
       assetId: allocation.asset,
       returnConditionNotes,
+    });
+
+    await logActivity({
+      actor: req.user._id,
+      action: "Asset Returned",
+      entityType: "Allocation",
+      entityId: updatedAlloc._id,
+      details: { assetName: allocation.asset?.name, tag: allocation.asset?.assetTag, notes: returnConditionNotes }
     });
 
     return res.status(200).json(updatedAlloc);

@@ -41,6 +41,17 @@ router.post("/", authMiddleware, async (req, res) => {
       endTime: new Date(endTime),
     });
 
+    const Asset = require("../models/Asset");
+    const { logActivity } = require("../services/activityLog.service");
+    const dbResource = await Asset.findById(resource);
+    await logActivity({
+      actor: req.user._id,
+      action: "Resource Booked",
+      entityType: "Booking",
+      entityId: booking._id,
+      details: { resourceName: dbResource?.name, tag: dbResource?.assetTag }
+    });
+
     return res.status(201).json(booking);
   } catch (error) {
     if (error.message.includes("overlap") || error.message.includes("not bookable")) {

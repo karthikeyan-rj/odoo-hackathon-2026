@@ -2,9 +2,11 @@ const express = require("express");
 const router = express.Router();
 const Asset = require("../models/Asset");
 const AssetCategory = require("../models/AssetCategory");
+const authMiddleware = require("../middleware/auth.middleware");
+const { logActivity } = require("../services/activityLog.service");
 
 // POST /api/assets - Register a new asset
-router.post("/", async (req, res) => {
+router.post("/", authMiddleware, async (req, res) => {
   try {
     const {
       name,
@@ -52,6 +54,15 @@ router.post("/", async (req, res) => {
     });
 
     await newAsset.save();
+
+    await logActivity({
+      actor: req.user?._id,
+      action: "Asset Registered",
+      entityType: "Asset",
+      entityId: newAsset._id,
+      details: { name: newAsset.name, tag: newAsset.assetTag }
+    });
+
     return res.status(201).json(newAsset);
   } catch (error) {
     console.error("Error registering asset:", error);
@@ -60,7 +71,7 @@ router.post("/", async (req, res) => {
 });
 
 // GET /api/assets - Retrieve assets with search and filters
-router.get("/", async (req, res) => {
+router.get("/", authMiddleware, async (req, res) => {
   try {
     const { search, category, status, department, location, isBookable } = req.query;
     const filter = {};

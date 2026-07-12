@@ -58,52 +58,43 @@ const assetSchema = new mongoose.Schema(
         return value.trim();
       },
     },
-
     acquisitionDate: {
       type: Date,
       default: null,
     },
-
     acquisitionCost: {
       type: Number,
       min: 0,
       default: null,
     },
-
     condition: {
       type: String,
       enum: ASSET_CONDITIONS,
       default: "Good",
     },
-
     location: {
       type: String,
       trim: true,
       default: "",
     },
-
     homeDepartment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
       default: null,
     },
-
     files: {
       type: [assetFileSchema],
       default: [],
     },
-
     customValues: {
       type: Map,
       of: mongoose.Schema.Types.Mixed,
       default: {},
     },
-
     isBookable: {
       type: Boolean,
       default: false,
     },
-
     status: {
       type: String,
       enum: ASSET_STATUSES,
@@ -114,11 +105,6 @@ const assetSchema = new mongoose.Schema(
     timestamps: true,
   }
 );
-
-// unique assetTag index is created automatically by { unique: true } on the field
-
-// Partial unique index — only enforces uniqueness when serialNumber exists
-// as a string. Documents without a serial number are ignored.
 assetSchema.index(
   { serialNumber: 1 },
   {

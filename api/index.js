@@ -1,18 +1,18 @@
 const express = require("express");
-const connectDB = require("./config/db");
+const connectDB = require("../server/config/db");
 
-require("./models/User");
-require("./models/Department");
-require("./models/AssetCategory");
-require("./models/Asset");
-require("./models/Allocation");
-require("./models/TransferRequest");
-require("./models/Booking");
-require("./models/MaintenanceRequest");
-require("./models/Notification");
-require("./models/AuditCycle");
-require("./models/AuditItem");
-require("./models/ActivityLog");
+require("../server/models/User");
+require("../server/models/Department");
+require("../server/models/AssetCategory");
+require("../server/models/Asset");
+require("../server/models/Allocation");
+require("../server/models/TransferRequest");
+require("../server/models/Booking");
+require("../server/models/MaintenanceRequest");
+require("../server/models/Notification");
+require("../server/models/AuditCycle");
+require("../server/models/AuditItem");
+require("../server/models/ActivityLog");
 
 const app = express();
 app.use(express.json());
@@ -45,20 +45,20 @@ app.use(async (req, res, next) => {
   }
 });
 
-app.use("/auth", require("./routes/auth.routes"));
-app.use("/assets", require("./routes/asset.routes"));
-app.use("/departments", require("./routes/department.routes"));
-app.use("/categories", require("./routes/category.routes"));
-app.use("/users", require("./routes/user.routes"));
-app.use("/allocations", require("./routes/allocation.routes"));
-app.use("/bookings", require("./routes/booking.routes"));
-app.use("/maintenance", require("./routes/maintenance.routes"));
-app.use("/transfers", require("./routes/transfer.routes"));
-app.use("/notifications", require("./routes/notification.routes"));
-app.use("/audits", require("./routes/audit.routes"));
-app.use("/activity-logs", require("./routes/activityLog.routes"));
+app.use("/api/auth", require("../server/routes/auth.routes"));
+app.use("/api/assets", require("../server/routes/asset.routes"));
+app.use("/api/departments", require("../server/routes/department.routes"));
+app.use("/api/categories", require("../server/routes/category.routes"));
+app.use("/api/users", require("../server/routes/user.routes"));
+app.use("/api/allocations", require("../server/routes/allocation.routes"));
+app.use("/api/bookings", require("../server/routes/booking.routes"));
+app.use("/api/maintenance", require("../server/routes/maintenance.routes"));
+app.use("/api/transfers", require("../server/routes/transfer.routes"));
+app.use("/api/notifications", require("../server/routes/notification.routes"));
+app.use("/api/audits", require("../server/routes/audit.routes"));
+app.use("/api/activity-logs", require("../server/routes/activityLog.routes"));
 
-app.get("/health", (_req, res) => {
+app.get("/api/health", (_req, res) => {
   res.json({ status: "ok", db: "connected" });
 });
 

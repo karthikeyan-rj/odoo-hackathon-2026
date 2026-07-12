@@ -1,32 +1,69 @@
-import React, { useState } from "react";
-import { useNavigate } from "react-router-dom";
-import api from "./api";
+import React from 'react'
+import { useNavigate } from 'react-router-dom'
 
-export default function Login() {
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [error, setError] = useState("");
-  const nav = useNavigate();
+// dummy login - will replace with real api later
+const roles = [
+  {
+    role: 'Admin',
+    name: 'Admin User',
+    email: 'admin@assetflow.local',
+    description: 'Manage users, departments and audit logs'
+  },
+  {
+    role: 'AssetManager',
+    name: 'Asset Manager',
+    email: 'manager@assetflow.local',
+    description: 'Add assets, handle allocations and transfers'
+  },
+  {
+    role: 'DepartmentHead',
+    name: 'Department Head',
+    email: 'depthead@assetflow.local',
+    description: 'View team assets and approve requests'
+  },
+  {
+    role: 'Employee',
+    name: 'John Employee',
+    email: 'john@assetflow.local',
+    description: 'View my assets, book resources, raise maintenance'
+  }
+]
 
-  const submit = async e => {
-    e.preventDefault();
-    try {
-      const { data } = await api.post("/api/auth/login", { email, password });
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("user", JSON.stringify(data.user));
-      nav("/dashboard");
-    } catch (err) { setError(err.response?.data?.error || "Login failed"); }
-  };
+function Login() {
+  const navigate = useNavigate()
+
+  function selectRole(user) {
+    localStorage.setItem('token', 'dummy-' + user.role)
+    localStorage.setItem('user', JSON.stringify(user))
+    navigate('/dashboard')
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-zinc-50">
-      <form onSubmit={submit} className="w-80 p-6 bg-white border border-zinc-200 rounded space-y-3">
-        <h2 className="text-sm font-bold text-zinc-900">AssetFlow Login</h2>
-        {error && <p className="text-xs text-red-600">{error}</p>}
-        <input type="email" placeholder="Email" required className="w-full p-2 text-xs border border-zinc-300 rounded" value={email} onChange={e => setEmail(e.target.value)} />
-        <input type="password" placeholder="Password" required className="w-full p-2 text-xs border border-zinc-300 rounded" value={password} onChange={e => setPassword(e.target.value)} />
-        <button type="submit" className="w-full py-2 bg-blue-600 text-white text-xs font-semibold rounded hover:bg-blue-700">Sign In</button>
-      </form>
+    <div className="min-h-screen bg-zinc-50 flex flex-col items-center justify-center p-6">
+      <div className="mb-8 text-center">
+        <h1 className="text-2xl font-bold text-zinc-900">AssetFlow</h1>
+        <p className="text-xs text-zinc-500 mt-1">Pick a role to continue (dummy auth for now)</p>
+      </div>
+
+      <div className="grid grid-cols-2 gap-4 w-full max-w-md">
+        {roles.map(function(user) {
+          return (
+            <button
+              key={user.role}
+              onClick={function() { selectRole(user) }}
+              className="text-left p-5 bg-white border border-zinc-200 rounded-lg hover:border-zinc-400 hover:shadow-sm transition"
+            >
+              <div className="text-sm font-semibold text-zinc-900">{user.name}</div>
+              <div className="text-[10px] text-zinc-400 mt-1 font-mono">{user.role}</div>
+              <div className="text-xs text-zinc-500 mt-2">{user.description}</div>
+            </button>
+          )
+        })}
+      </div>
+
+      <p className="text-[10px] text-zinc-400 mt-6">No backend needed — real login will be added later</p>
     </div>
-  );
+  )
 }
+
+export default Login

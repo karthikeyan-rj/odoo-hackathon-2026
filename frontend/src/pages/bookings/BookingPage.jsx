@@ -18,10 +18,8 @@ export default function BookingPage() {
   
   const [formData, setFormData] = useState({
     resource: '',
-    startDate: '',
-    startTime: '',
-    endDate: '',
-    endTime: '',
+    startDateTime: '',
+    endDateTime: '',
     purpose: ''
   });
 
@@ -65,17 +63,17 @@ export default function BookingPage() {
   const handleBook = async (e) => {
     e.preventDefault();
     try {
-      const startDateTime = new Date(`${formData.startDate}T${formData.startTime}`).toISOString();
-      const endDateTime = new Date(`${formData.endDate}T${formData.endTime}`).toISOString();
+      const startIso = new Date(formData.startDateTime).toISOString();
+      const endIso = new Date(formData.endDateTime).toISOString();
 
       await api.post('/bookings', {
         resourceId: formData.resource,
         purpose: formData.purpose,
-        startTime: startDateTime,
-        endTime: endDateTime,
+        startTime: startIso,
+        endTime: endIso,
       });
       setBookingModalOpen(false);
-      setFormData({ resource: '', startDate: '', startTime: '', endDate: '', endTime: '', purpose: '' });
+      setFormData({ resource: '', startDateTime: '', endDateTime: '', purpose: '' });
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to book resource');
@@ -85,7 +83,7 @@ export default function BookingPage() {
   const handleCancel = async (bookingId) => {
     if (!confirm('Cancel this booking?')) return;
     try {
-      await api.post(`/bookings/${bookingId}/cancel`);
+      await api.patch(`/bookings/${bookingId}/cancel`);
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to cancel');
@@ -115,8 +113,8 @@ export default function BookingPage() {
     }}
   ];
 
-  // Helper to set min date to today
-  const todayStr = dayjs().format('YYYY-MM-DD');
+  // Helper to set min date-time to now
+  const nowStr = dayjs().format('YYYY-MM-DDTHH:mm');
 
   return (
     <div className="max-w-6xl mx-auto space-y-6 animate-fade_in">
@@ -143,14 +141,12 @@ export default function BookingPage() {
           </div>
           <div className="grid grid-cols-2 gap-6">
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-ink">Start</label>
-              <input required type="date" min={todayStr} value={formData.startDate} onChange={(e) => setFormData({...formData, startDate: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
-              <input required type="time" value={formData.startTime} onChange={(e) => setFormData({...formData, startTime: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
+              <label className="block text-sm font-medium text-ink">Start Time</label>
+              <input required type="datetime-local" min={nowStr} value={formData.startDateTime} onChange={(e) => setFormData({...formData, startDateTime: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
             </div>
             <div className="space-y-3">
-              <label className="block text-sm font-medium text-ink">End</label>
-              <input required type="date" min={formData.startDate || todayStr} value={formData.endDate} onChange={(e) => setFormData({...formData, endDate: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
-              <input required type="time" value={formData.endTime} onChange={(e) => setFormData({...formData, endTime: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
+              <label className="block text-sm font-medium text-ink">End Time</label>
+              <input required type="datetime-local" min={formData.startDateTime || nowStr} value={formData.endDateTime} onChange={(e) => setFormData({...formData, endDateTime: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
             </div>
           </div>
           <div>

@@ -74,7 +74,7 @@ export default function MaintenancePage() {
 
   const handleAction = async (action, reqId) => {
     try {
-      await api.post(`/maintenance/${reqId}/${action}`);
+      await api.patch(`/maintenance/${reqId}/${action}`);
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || `Failed to ${action}`);
@@ -84,7 +84,7 @@ export default function MaintenancePage() {
   const handleAssign = async (e) => {
     e.preventDefault();
     try {
-      await api.post(`/maintenance/${selectedReqId}/assign`, { technicianName });
+      await api.patch(`/maintenance/${selectedReqId}/assign-technician`, { technicianName });
       setAssignModalOpen(false);
       setTechnicianName('');
       fetchData();
@@ -116,7 +116,7 @@ export default function MaintenancePage() {
         <button onClick={() => { setSelectedReqId(row._id); setAssignModalOpen(true); }} className="text-status-reserved text-sm hover:underline">Assign Tech</button>
       );
       if (row.status === 'TechnicianAssigned') return (
-        <button onClick={() => handleAction('start', row._id)} className="text-status-allocated text-sm hover:underline">Start Work</button>
+        <button onClick={() => handleAction('in-progress', row._id)} className="text-status-allocated text-sm hover:underline">Start Work</button>
       );
       if (row.status === 'InProgress') return (
         <button onClick={() => handleAction('resolve', row._id)} className="text-status-available text-sm hover:underline">Resolve</button>

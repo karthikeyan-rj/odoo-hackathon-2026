@@ -74,6 +74,7 @@ router.get('/', async (req, res, next) => {
     if (req.query.status) filter.status = req.query.status;
     if (req.query.department) filter.department = req.query.department;
     if (req.query.location) filter.location = new RegExp(req.query.location, 'i');
+    if (req.query.isBookable !== undefined) filter.isBookable = req.query.isBookable === 'true';
     if (req.query.search) {
       const re = new RegExp(req.query.search, 'i');
       filter.$or = [{ assetTag: re }, { serialNumber: re }, { name: re }];

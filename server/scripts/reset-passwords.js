@@ -12,8 +12,11 @@ const resetPasswords = async () => {
     
     console.log(`Found ${users.length} users. Resetting passwords to "password123"...`);
     
+    const bcrypt = require('bcrypt');
+    const newHash = await bcrypt.hash('password123', 12);
+    
     for (const user of users) {
-      user.password = 'password123';
+      user.passwordHash = newHash;
       await user.save();
     }
     

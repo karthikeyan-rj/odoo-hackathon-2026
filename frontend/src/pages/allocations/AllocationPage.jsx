@@ -59,7 +59,7 @@ export default function AllocationPage() {
         const res = await api.get('/allocations');
         setAllocations(res.data.data);
       } else {
-        const res = await api.get('/allocations/transfers');
+        const res = await api.get('/transfer-requests');
         setTransfers(res.data.data);
       }
     } catch (err) {
@@ -109,7 +109,7 @@ export default function AllocationPage() {
   const handleTransferRequest = async (e) => {
     e.preventDefault();
     try {
-      await api.post('/allocations/transfers', { assetId: transferAssetId, targetId: transferTargetId, targetType: 'User' });
+      await api.post('/transfer-requests', { assetId: transferAssetId, targetId: transferTargetId, targetType: 'User' });
       setTransferModalOpen(false);
       setTransferAssetId('');
       setTransferTargetId('');
@@ -121,7 +121,7 @@ export default function AllocationPage() {
 
   const handleApproveTransfer = async (transferId) => {
     try {
-      await api.post(`/allocations/transfers/${transferId}/approve`);
+      await api.patch(`/transfer-requests/${transferId}/approve`);
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to approve');
@@ -130,7 +130,7 @@ export default function AllocationPage() {
 
   const handleRejectTransfer = async (transferId) => {
     try {
-      await api.post(`/allocations/transfers/${transferId}/reject`);
+      await api.patch(`/transfer-requests/${transferId}/reject`);
       fetchData();
     } catch (err) {
       alert(err.response?.data?.message || 'Failed to reject');

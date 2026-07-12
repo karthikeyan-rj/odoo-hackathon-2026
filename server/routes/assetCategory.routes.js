@@ -31,7 +31,7 @@ router.get('/:id', async (req, res, next) => {
 });
 
 // ── POST /api/asset-categories ─────────────────────────────────────────────────
-router.post('/', requireRole(ROLES.ADMIN), async (req, res, next) => {
+router.post('/', requireRole(ROLES.ADMIN, ROLES.ASSET_MANAGER), async (req, res, next) => {
   try {
     const { name, description } = req.body;
     if (!name) return res.status(400).json({ success: false, data: null, message: 'name is required.' });
@@ -46,7 +46,7 @@ router.post('/', requireRole(ROLES.ADMIN), async (req, res, next) => {
 });
 
 // ── PUT /api/asset-categories/:id ─────────────────────────────────────────────
-router.put('/:id', requireRole(ROLES.ADMIN), async (req, res, next) => {
+router.put('/:id', requireRole(ROLES.ADMIN, ROLES.ASSET_MANAGER), async (req, res, next) => {
   try {
     const { name, description, status } = req.body;
     const cat = await AssetCategory.findByIdAndUpdate(
@@ -62,7 +62,7 @@ router.put('/:id', requireRole(ROLES.ADMIN), async (req, res, next) => {
 });
 
 // ── DELETE /api/asset-categories/:id ──────────────────────────────────────────
-router.delete('/:id', requireRole(ROLES.ADMIN), async (req, res, next) => {
+router.delete('/:id', requireRole(ROLES.ADMIN, ROLES.ASSET_MANAGER), async (req, res, next) => {
   try {
     const cat = await AssetCategory.findByIdAndDelete(req.params.id);
     if (!cat) return res.status(404).json({ success: false, data: null, message: 'Category not found.' });

@@ -24,16 +24,16 @@ export default function Modal({ isOpen, onClose, title, children }) {
       {/* Overlay */}
       <div 
         ref={overlayRef}
-        className="absolute inset-0 bg-ink/40 backdrop-blur-sm transition-opacity"
+        className="absolute inset-0 bg-ink/20 backdrop-blur-md transition-opacity"
         onClick={(e) => {
           if (e.target === overlayRef.current) onClose();
         }}
       />
       
       {/* Modal Content */}
-      <div className="relative bg-surface rounded-xl shadow-modal w-full max-w-lg mx-4 flex flex-col max-h-[90vh] animate-fade_in">
+      <div className="relative bg-surface/95 backdrop-blur-xl border border-white/20 rounded-2xl shadow-modal w-full max-w-lg mx-4 flex flex-col max-h-[90vh] animate-scale_in">
         {/* Header */}
-        <div className="flex items-center justify-between px-6 py-4 border-b border-border">
+        <div className="flex items-center justify-between px-6 py-4 border-b border-border/50">
           <h2 className="text-lg font-bold text-ink">{title}</h2>
           <button 
             onClick={onClose}

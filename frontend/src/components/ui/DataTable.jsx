@@ -47,23 +47,23 @@ export default function DataTable({
   }
 
   return (
-    <div className="bg-surface border border-border rounded-xl overflow-x-auto shadow-sm">
-      <table className="w-full text-left whitespace-nowrap">
-        <thead className="bg-bg border-b border-border">
+    <div className="bg-surface/90 backdrop-blur-md border border-border/80 rounded-2xl overflow-x-auto shadow-sm transition-all">
+      <table className="w-full text-left whitespace-nowrap min-w-max">
+        <thead className="bg-bg/50 border-b border-border/60">
           <tr>
             {columns.map((col, i) => (
-              <th key={i} className="px-6 py-3 text-xs font-semibold text-ink-muted uppercase tracking-wider">
+              <th key={i} className="px-6 py-3.5 text-xs font-semibold text-ink-muted uppercase tracking-wider">
                 {col.header}
               </th>
             ))}
           </tr>
         </thead>
-        <tbody className="divide-y divide-border">
+        <tbody className="divide-y divide-border/60">
           {data.map((row) => (
             <tr 
               key={row[keyField]} 
               onClick={() => onRowClick && onRowClick(row)}
-              className={`transition-colors ${onRowClick ? 'cursor-pointer hover:bg-bg/50' : ''} ${highlightedRowId === row[keyField] ? 'row-flash' : ''}`}
+              className={`transition-all duration-200 ${onRowClick ? 'cursor-pointer hover:bg-bg/80' : 'hover:bg-bg/40'} ${highlightedRowId === row[keyField] ? 'row-flash' : ''}`}
             >
               {columns.map((col, j) => (
                 <td key={j} className={`px-6 py-4 text-sm ${col.className || 'text-ink'}`}>

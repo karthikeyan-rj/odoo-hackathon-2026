@@ -26,6 +26,8 @@ export default function AssetListPage() {
   const [formData, setFormData] = useState({
     name: '', category: '', serialNumber: '', description: '', isBookable: false
   });
+  const [isCreatingCategory, setIsCreatingCategory] = useState(false);
+  const [newCategoryName, setNewCategoryName] = useState('');
 
   useEffect(() => {
     fetchData();
@@ -79,6 +81,19 @@ export default function AssetListPage() {
     } catch (err) {
       console.error(err);
       alert(err.response?.data?.message || 'Registration failed');
+    }
+  };
+
+  const handleCreateCategory = async () => {
+    if (!newCategoryName.trim()) return;
+    try {
+      const res = await api.post('/asset-categories', { name: newCategoryName });
+      setCategories([...categories, res.data.data]);
+      setFormData({ ...formData, category: res.data.data._id });
+      setIsCreatingCategory(false);
+      setNewCategoryName('');
+    } catch (err) {
+      alert(err.response?.data?.message || 'Failed to create category');
     }
   };
 
@@ -139,11 +154,24 @@ export default function AssetListPage() {
             <input required type="text" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
           </div>
           <div>
-            <label className="block text-sm font-medium text-ink mb-1.5">Category</label>
-            <select required value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm">
-              <option value="" disabled>Select a category</option>
-              {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
-            </select>
+            <div className="flex items-center justify-between mb-1.5">
+              <label className="block text-sm font-medium text-ink">Category</label>
+              {canManage && !isCreatingCategory && (
+                <button type="button" onClick={() => setIsCreatingCategory(true)} className="text-xs text-accent hover:underline focus:outline-none">+ New Category</button>
+              )}
+            </div>
+            {isCreatingCategory ? (
+              <div className="flex gap-2">
+                <input type="text" placeholder="Category Name" value={newCategoryName} onChange={(e) => setNewCategoryName(e.target.value)} className="flex-1 rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm" />
+                <button type="button" onClick={handleCreateCategory} className="px-3 py-2 bg-accent text-white rounded-lg text-sm font-medium hover:bg-accent-hover">Save</button>
+                <button type="button" onClick={() => setIsCreatingCategory(false)} className="px-3 py-2 bg-bg text-ink-muted rounded-lg text-sm font-medium hover:text-ink">Cancel</button>
+              </div>
+            ) : (
+              <select required value={formData.category} onChange={(e) => setFormData({...formData, category: e.target.value})} className="w-full rounded-lg border-border bg-surface px-4 py-2 outline-none focus:border-accent text-sm">
+                <option value="" disabled>Select a category</option>
+                {categories.map(c => <option key={c._id} value={c._id}>{c.name}</option>)}
+              </select>
+            )}
           </div>
           <div>
             <label className="block text-sm font-medium text-ink mb-1.5">Serial Number</label>

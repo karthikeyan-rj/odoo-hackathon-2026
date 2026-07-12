@@ -50,8 +50,8 @@ function NavItem({ to, label, icon, exact = false }) {
       to={to}
       end={exact}
       className={({ isActive }) =>
-        `flex items-center gap-3 px-4 py-2.5 mt-1 rounded-lg transition-colors font-medium text-sm
-        ${isActive ? 'bg-accent/10 text-accent' : 'text-ink-muted hover:bg-surface hover:text-ink'}`
+        `flex items-center gap-3 px-4 py-3 mt-1 rounded-xl transition-all duration-200 font-medium text-sm
+        ${isActive ? 'bg-accent text-white shadow-md shadow-accent/20' : 'text-ink-muted hover:bg-bg hover:text-ink'}`
       }
     >
       {icon}
@@ -66,7 +66,7 @@ function BottomNavItem({ to, label, icon, exact = false }) {
       to={to}
       end={exact}
       className={({ isActive }) =>
-        `flex flex-col items-center justify-center w-full h-full space-y-1 transition-colors
+        `flex flex-col items-center justify-center w-full h-full space-y-1 transition-all duration-200
         ${isActive ? 'text-accent' : 'text-ink-muted hover:text-ink'}`
       }
     >
@@ -116,33 +116,32 @@ export default function AppShell() {
   };
 
   return (
-    <div className="flex h-screen bg-bg overflow-hidden relative">
+    <div className="flex h-screen bg-bg overflow-hidden relative font-ui">
       {/* Backdrop overlay for when sidebar is open on smaller screens */}
       {isSidebarOpen && (
         <div 
-          className="fixed inset-0 bg-black/50 z-20 transition-opacity lg:hidden"
+          className="fixed inset-0 bg-ink/30 backdrop-blur-sm z-20 transition-opacity lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}
 
       {/* Sidebar */}
-      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-surface border-r border-border flex flex-col transition-transform duration-300 ease-in-out ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
-        <div className="p-6 flex items-center justify-between">
-          <h1 className="text-xl font-bold tracking-tight text-ink">AssetFlow</h1>
+      <aside className={`fixed inset-y-0 left-0 z-30 w-64 bg-surface/95 backdrop-blur-xl border-r border-border flex flex-col transition-transform duration-300 ease-out shadow-lg lg:shadow-none ${isSidebarOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="p-4 flex items-center justify-end">
           <button 
             onClick={() => setIsSidebarOpen(false)} 
-            className="lg:hidden p-1 text-ink-muted hover:text-ink hover:bg-bg rounded-lg transition-colors focus:outline-none"
+            className="lg:hidden p-2 text-ink-muted hover:text-ink hover:bg-bg rounded-lg transition-colors focus:outline-none"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
             </svg>
           </button>
         </div>
-        <nav className="flex-1 px-3 space-y-1">
+        <nav className="flex-1 px-4 space-y-1 mt-2">
           {navLinks.map(link => <NavItem key={link.to} {...link} />)}
           {user?.role === 'Admin' && (
             <>
-              <div className="mt-8 mb-2 px-4 text-xs font-semibold text-ink-muted uppercase tracking-wider">
+              <div className="mt-8 mb-3 px-4 text-[11px] font-bold text-ink-muted uppercase tracking-widest">
                 Admin
               </div>
               <NavItem to="/audits" label="Audits" icon={ICONS.audits} />
@@ -152,17 +151,17 @@ export default function AppShell() {
         </nav>
         <div className="p-4 border-t border-border mb-16 lg:mb-0">
           <div className="flex items-center gap-3 mb-4 px-2">
-            <div className="w-8 h-8 rounded-full bg-accent/10 text-accent flex items-center justify-center font-bold text-sm">
+            <div className="w-9 h-9 rounded-full bg-gradient-to-tr from-accent to-accent-hover text-white flex items-center justify-center font-bold text-sm shadow-sm">
               {user?.name.charAt(0).toUpperCase()}
             </div>
             <div className="flex-1 min-w-0">
               <p className="text-sm font-semibold text-ink truncate">{user?.name}</p>
-              <p className="text-xs text-ink-muted truncate">{user?.role}</p>
+              <p className="text-xs text-ink-muted truncate font-medium">{user?.role}</p>
             </div>
           </div>
           <button
             onClick={handleLogout}
-            className="w-full py-2 text-sm font-medium text-ink-muted hover:text-ink hover:bg-bg rounded-lg transition-colors"
+            className="w-full py-2.5 text-sm font-medium text-ink-muted hover:text-rose-600 hover:bg-rose-50 rounded-xl transition-colors"
           >
             Sign out
           </button>
@@ -170,31 +169,37 @@ export default function AppShell() {
       </aside>
 
       {/* Main Content */}
-      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-in-out ${isSidebarOpen ? 'lg:ml-64' : 'ml-0'}`}>
+      <div className={`flex-1 flex flex-col min-w-0 transition-all duration-300 ease-out ${isSidebarOpen ? 'lg:ml-64' : 'ml-0'}`}>
         {/* Top bar */}
-        <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-6 shadow-sm z-10 sticky top-0">
-          <button 
-            onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
-            className="p-2 -ml-2 text-ink-muted hover:text-ink transition-colors rounded-lg hover:bg-bg focus:outline-none"
-          >
-            {isSidebarOpen ? (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
-              </svg>
-            ) : (
-              <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
-              </svg>
-            )}
-          </button>
+        <header className="h-16 bg-surface/80 backdrop-blur-xl border-b border-border flex items-center justify-between px-6 z-10 sticky top-0 transition-all duration-200">
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsSidebarOpen(!isSidebarOpen)} 
+              className="p-2 -ml-2 text-ink-muted hover:text-ink transition-colors rounded-lg hover:bg-bg focus:outline-none"
+            >
+              {isSidebarOpen ? (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              ) : (
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 6h16M4 12h16M4 18h16" />
+                </svg>
+              )}
+            </button>
+            <div className="flex items-center gap-2.5">
+              <img src="/logo.png" alt="AssetFlow Logo" className="w-8 h-8 object-contain rounded-md shadow-sm" />
+              <h1 className="text-xl font-display font-bold tracking-tight text-ink">AssetFlow</h1>
+            </div>
+          </div>
 
-          <NavLink to="/notifications" className="relative p-2 text-ink-muted hover:text-ink transition-colors">
+          <NavLink to="/notifications" className="relative p-2 text-ink-muted hover:text-accent transition-colors rounded-full hover:bg-accent/10">
             {/* Simple Bell Icon */}
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
             </svg>
             {unreadCount > 0 && (
-              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-red-500 rounded-full border-2 border-surface animate-pulse" />
+              <span className="absolute top-1 right-1 w-2.5 h-2.5 bg-rose-500 rounded-full border-2 border-surface animate-pulse" />
             )}
           </NavLink>
         </header>
@@ -206,7 +211,7 @@ export default function AppShell() {
       </div>
 
       {/* Bottom Navigation for Mobile */}
-      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface border-t border-border flex items-center justify-around z-40 px-2 shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.05)] overflow-x-auto">
+      <nav className="lg:hidden fixed bottom-0 left-0 right-0 h-16 bg-surface/90 backdrop-blur-xl border-t border-border flex items-center justify-around z-40 px-2 shadow-[0_-4px_10px_rgba(0,0,0,0.03)] overflow-x-auto">
         {navLinks.map(link => <BottomNavItem key={link.to} {...link} />)}
         {user?.role === 'Admin' && (
           <>

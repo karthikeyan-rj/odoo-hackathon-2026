@@ -97,7 +97,7 @@ export default function AssetDetailPage() {
           <StatusChip status={asset.status} pulse />
         </div>
 
-        <div className="grid grid-cols-2 gap-8 border-t border-border pt-6">
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-border/50 pt-6">
           <div>
             <h3 className="text-xs font-semibold text-ink-muted uppercase tracking-wider mb-3">Current Assignment</h3>
             {asset.currentAllocation ? (

@@ -1,4 +1,4 @@
-@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Mono:wght@400;500&family=Inter:wght@400;500;600;700&family=Outfit:wght@400;500;600;700&display=swap');
 
 @tailwind base;
 @tailwind components;
@@ -6,17 +6,17 @@
 
 /* ── CSS Variables ─────────────────────────────────────────────────────────── */
 :root {
-  --bg: #F7F8FA;
-  --surface: #FFFFFF;
-  --border: #E2E4E9;
-  --ink: #14181F;
-  --ink-muted: #6B7280;
-  --accent: #4F46E5;
-  --status-available: #16A34A;
-  --status-allocated: #C2740B;
-  --status-maintenance: #DC2626;
-  --status-reserved: #2563EB;
-  --status-inactive: #6B7280;
+  --bg: #F8FAFC;
+  --surface: rgba(255, 255, 255, 0.85);
+  --border: #E2E8F0;
+  --ink: #0F172A;
+  --ink-muted: #64748B;
+  --accent: #6366F1;
+  --status-available: #10B981;
+  --status-allocated: #F59E0B;
+  --status-maintenance: #EF4444;
+  --status-reserved: #3B82F6;
+  --status-inactive: #94A3B8;
 }
 
 /* ── Base ──────────────────────────────────────────────────────────────────── */
@@ -28,9 +28,13 @@ body {
   margin: 0;
   background-color: var(--bg);
   color: var(--ink);
-  font-family: 'Inter', 'Manrope', system-ui, sans-serif;
+  font-family: 'Inter', system-ui, sans-serif;
   font-size: 0.9375rem;
   line-height: 1.5;
+}
+
+h1, h2, h3, h4, h5, h6 {
+  font-family: 'Outfit', system-ui, sans-serif;
 }
 
 /* ── Live Pulse Animation ──────────────────────────────────────────────────── */
@@ -53,8 +57,8 @@ body {
   border-radius: 4px;
 }
 
-/* Scrollbar (webkit) */
+/* Scrollbar (webkit) - Elegant & Minimal */
 ::-webkit-scrollbar { width: 6px; height: 6px; }
 ::-webkit-scrollbar-track { background: transparent; }
-::-webkit-scrollbar-thumb { background: var(--border); border-radius: 99px; }
-::-webkit-scrollbar-thumb:hover { background: var(--ink-muted); }
+::-webkit-scrollbar-thumb { background: rgba(148, 163, 184, 0.4); border-radius: 99px; transition: background 0.2s; }
+::-webkit-scrollbar-thumb:hover { background: rgba(148, 163, 184, 0.7); }

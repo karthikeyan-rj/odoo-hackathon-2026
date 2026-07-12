@@ -1,16 +1,7 @@
-/**
- * AssetFlow — Minimal server entry point.
- *
- * Connects to MongoDB, registers all Mongoose models (so indexes are
- * created), and starts an Express server.  Routes and controllers will
- * be added in later tasks.
- */
 
 require("dotenv").config();
 const express = require("express");
 const connectDB = require("./config/db");
-
-// Import every model so Mongoose creates the collections and indexes.
 require("./models/User");
 require("./models/Department");
 require("./models/AssetCategory");
@@ -31,8 +22,6 @@ async function start() {
 
   const app = express();
   app.use(express.json());
-
-  // Health-check endpoint
   app.get("/api/health", (_req, res) => {
     res.json({ status: "ok", db: "connected" });
   });

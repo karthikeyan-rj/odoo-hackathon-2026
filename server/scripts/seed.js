@@ -1,25 +1,8 @@
-/**
- * Seed script — inserts baseline data into a clean database.
- *
- * Inserts:
- *  - 1 Admin user (email/password from env)
- *  - 2 departments
- *  - 2 asset categories
- *  - 2 example assets
- *
- * Safe to run more than once — uses upsert-style findOneAndUpdate
- * so existing documents are not duplicated.
- *
- * Usage:
- *   node scripts/seed.js
- */
-
 require("dotenv").config();
 const mongoose = require("mongoose");
 const bcrypt = require("bcrypt");
 const connectDB = require("../config/db");
 
-// Models (importing registers them with Mongoose)
 const User = require("../models/User");
 const Department = require("../models/Department");
 const AssetCategory = require("../models/AssetCategory");
@@ -31,7 +14,6 @@ async function seed() {
   await connectDB();
   console.log("Seeding database…\n");
 
-  // ── Admin user ──────────────────────────────────
   const adminEmail =
     process.env.SEED_ADMIN_EMAIL || "admin@assetflow.local";
   const adminPassword =
@@ -55,7 +37,6 @@ async function seed() {
 
   console.log(`Admin  → ${admin.email} (${admin._id})`);
 
-  // ── Departments ─────────────────────────────────
   const itDept = await Department.findOneAndUpdate(
     { name: "IT" },
     {
@@ -81,7 +62,6 @@ async function seed() {
   console.log(`Dept   → ${itDept.name} (${itDept._id})`);
   console.log(`Dept   → ${hrDept.name} (${hrDept._id})`);
 
-  // ── Asset categories ────────────────────────────
   const laptopCat = await AssetCategory.findOneAndUpdate(
     { name: "Laptop" },
     {
@@ -114,7 +94,6 @@ async function seed() {
   console.log(`Cat    → ${laptopCat.name} (${laptopCat._id})`);
   console.log(`Cat    → ${projectorCat.name} (${projectorCat._id})`);
 
-  // ── Assets ──────────────────────────────────────
   const laptop = await Asset.findOneAndUpdate(
     { assetTag: "AF-0001" },
     {

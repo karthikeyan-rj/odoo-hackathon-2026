@@ -10,63 +10,51 @@ const allocationSchema = new mongoose.Schema(
       ref: "Asset",
       required: true,
     },
-
     assigneeType: {
       type: String,
       enum: ["User", "Department"],
       required: true,
     },
-
     assigneeUser: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       default: null,
     },
-
     assigneeDepartment: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "Department",
       default: null,
     },
-
     allocatedBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
-
     allocatedAt: {
       type: Date,
       default: Date.now,
     },
-
     expectedReturnDate: {
       type: Date,
       default: null,
     },
-
     returnedAt: {
       type: Date,
       default: null,
     },
-
     returnConditionNotes: {
       type: String,
       trim: true,
       default: "",
     },
-
     status: {
       type: String,
       enum: ALLOCATION_STATUSES,
       default: "Active",
     },
   },
-  {
-    timestamps: true,
-  }
+  {timestamps: true,}
 );
-
 allocationSchema.pre("validate", function validateAssignee(next) {
   if (
     this.assigneeType === "User" &&
@@ -78,7 +66,6 @@ allocationSchema.pre("validate", function validateAssignee(next) {
       )
     );
   }
-
   if (
     this.assigneeType === "Department" &&
     (!this.assigneeDepartment || this.assigneeUser)
@@ -89,11 +76,8 @@ allocationSchema.pre("validate", function validateAssignee(next) {
       )
     );
   }
-
   next();
 });
-
-// Only one active allocation is allowed for an asset.
 allocationSchema.index(
   { asset: 1 },
   {
@@ -103,7 +87,6 @@ allocationSchema.index(
     },
   }
 );
-
 allocationSchema.index({ asset: 1, status: 1 });
 allocationSchema.index({ assigneeUser: 1 });
 allocationSchema.index({ assigneeDepartment: 1 });

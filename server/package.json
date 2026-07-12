@@ -1,0 +1,20 @@
+{
+  "name": "assetflow-server",
+  "version": "1.0.0",
+  "description": "AssetFlow backend — Node.js + Express + MongoDB",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js",
+    "dev": "nodemon server.js"
+  },
+  "type": "commonjs",
+  "dependencies": {
+    "bcrypt": "*",
+    "cors": "*",
+    "dotenv": "*",
+    "express": "*",
+    "jsonwebtoken": "*",
+    "mongoose": "*",
+    "morgan": "*"
+  }
+}

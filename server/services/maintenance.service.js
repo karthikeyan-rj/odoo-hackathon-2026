@@ -4,6 +4,7 @@ const { MAINTENANCE_STATUS, ASSET_STATUS } = require('../constants/enums');
 const { notify } = require('./notification.service');
 const { NOTIFICATION_TYPE, ENTITY_TYPE } = require('../constants/enums');
 const socketStore = require('../config/socket');
+const { logActivity } = require('./activityLog.service');
 
 const emitSafe = (event, data) => {
   try { socketStore.getIO().to('broadcast').emit(event, data); } catch (_) {}
@@ -22,6 +23,15 @@ const raiseRequest = async ({ assetId, raisedBy, description, priority, attachme
     { path: 'asset', select: 'assetTag name' },
     { path: 'raisedBy', select: 'name email' },
   ]);
+
+  logActivity({
+    actor: raisedBy,
+    action: 'RAISE_MAINTENANCE_REQUEST',
+    entityType: 'MaintenanceRequest',
+    entityId: request._id,
+    details: { assetTag: request.asset?.assetTag, priority },
+  }).catch(() => {});
+
   return request;
 };
 
@@ -49,6 +59,14 @@ const approveRequest = async ({ requestId, approvedBy }) => {
     entityId: request._id,
   }).catch(() => {});
 
+  logActivity({
+    actor: approvedBy,
+    action: 'APPROVE_MAINTENANCE_REQUEST',
+    entityType: 'MaintenanceRequest',
+    entityId: request._id,
+    details: { assetTag: request.asset?.assetTag },
+  }).catch(() => {});
+
   emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.APPROVED });
   return request;
 };
@@ -72,6 +90,14 @@ const rejectRequest = async ({ requestId, approvedBy }) => {
     message: `Your maintenance request for ${request.asset.assetTag} has been rejected.`,
     entityType: ENTITY_TYPE.MAINTENANCE_REQUEST,
     entityId: request._id,
+  }).catch(() => {});
+
+  logActivity({
+    actor: approvedBy,
+    action: 'REJECT_MAINTENANCE_REQUEST',
+    entityType: 'MaintenanceRequest',
+    entityId: request._id,
+    details: { assetTag: request.asset?.assetTag },
   }).catch(() => {});
 
   emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.REJECTED });
@@ -128,6 +154,16 @@ const resolveRequest = async ({ requestId }) => {
   const asset = await Asset.findById(request.asset._id);
   if (asset && safeStatuses.includes(asset.status)) {
     await Asset.findByIdAndUpdate(request.asset._id, { status: ASSET_STATUS.AVAILABLE });
+  }
+
+  if (request.approvedBy) {
+    logActivity({
+      actor: request.approvedBy,
+      action: 'RESOLVE_MAINTENANCE_REQUEST',
+      entityType: 'MaintenanceRequest',
+      entityId: request._id,
+      details: { assetTag: request.asset?.assetTag },
+    }).catch(() => {});
   }
 
   emitSafe('maintenance:statusChanged', { requestId, status: MAINTENANCE_STATUS.RESOLVED });

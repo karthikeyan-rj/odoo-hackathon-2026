@@ -10,6 +10,7 @@ const TransferRequest = require('../models/TransferRequest');
 const { ASSET_STATUS, ALLOCATION_STATUS, TRANSFER_STATUS } = require('../constants/enums');
 const { notify } = require('./notification.service');
 const { NOTIFICATION_TYPE, ENTITY_TYPE } = require('../constants/enums');
+const { logActivity } = require('./activityLog.service');
 
 /**
  * allocateAsset — atomically allocate an asset to a user or department.
@@ -70,6 +71,14 @@ const allocateAsset = async ({ assetId, assigneeType, assigneeId, allocatedBy, e
     }).catch(() => {});
   }
 
+  logActivity({
+    actor: allocatedBy,
+    action: 'ALLOCATE_ASSET',
+    entityType: 'Allocation',
+    entityId: allocation._id,
+    details: { assetTag: asset.assetTag, assetName: asset.name },
+  }).catch(() => {});
+
   emitSafe('allocation:created', { allocation });
   return allocation;
 };
@@ -91,6 +100,14 @@ const returnAsset = async ({ allocationId, conditionNotes, returnedBy }) => {
   await allocation.save();
 
   await Asset.findByIdAndUpdate(allocation.asset, { status: ASSET_STATUS.AVAILABLE });
+
+  logActivity({
+    actor: returnedBy,
+    action: 'RETURN_ASSET',
+    entityType: 'Allocation',
+    entityId: allocation._id,
+  }).catch(() => {});
+
   emitSafe('allocation:returned', { allocationId: allocation._id, assetId: allocation.asset });
   return allocation;
 };
@@ -112,6 +129,14 @@ const createTransferRequest = async ({ assetId, requestedBy, targetType, targetI
     { path: 'asset', select: 'assetTag name' },
     { path: 'requestedBy', select: 'name email' },
   ]);
+
+  logActivity({
+    actor: requestedBy,
+    action: 'REQUEST_TRANSFER',
+    entityType: 'TransferRequest',
+    entityId: transferRequest._id,
+    details: { assetTag: transferRequest.asset?.assetTag },
+  }).catch(() => {});
 
   emitSafe('transfer:requested', { transferRequest });
   return transferRequest;
@@ -172,6 +197,13 @@ const approveTransfer = async ({ transferRequestId, approvedBy }) => {
     }).catch(() => {});
   }
 
+  logActivity({
+    actor: approvedBy,
+    action: 'APPROVE_TRANSFER',
+    entityType: 'TransferRequest',
+    entityId: transferRequest._id,
+  }).catch(() => {});
+
   emitSafe('transfer:approved', { result });
   return result;
 };
@@ -191,6 +223,13 @@ const rejectTransfer = async ({ transferRequestId, reviewedBy }) => {
     err.statusCode = 404;
     throw err;
   }
+
+  logActivity({
+    actor: reviewedBy,
+    action: 'REJECT_TRANSFER',
+    entityType: 'TransferRequest',
+    entityId: transferRequest._id,
+  }).catch(() => {});
 
   emitSafe('transfer:rejected', { transferRequest });
   return transferRequest;

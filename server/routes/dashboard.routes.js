@@ -4,6 +4,7 @@ const Allocation = require('../models/Allocation');
 const Booking = require('../models/Booking');
 const MaintenanceRequest = require('../models/MaintenanceRequest');
 const TransferRequest = require('../models/TransferRequest');
+const ActivityLog = require('../models/ActivityLog');
 const { requireAuth } = require('../middleware/auth.middleware');
 const { ASSET_STATUS, ALLOCATION_STATUS, BOOKING_STATUS, MAINTENANCE_STATUS, TRANSFER_STATUS } = require('../constants/enums');
 
@@ -70,6 +71,69 @@ router.get('/kpis', async (req, res, next) => {
       },
       message: 'Dashboard KPIs fetched.',
     });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── GET /api/dashboard/utilization ────────────────────────────────────────────
+// Asset count grouped by status, for the Asset Utilization donut chart.
+router.get('/utilization', async (req, res, next) => {
+  try {
+    const rows = await Asset.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+
+    const byStatus = Object.values(ASSET_STATUS).reduce((acc, status) => {
+      acc[status] = 0;
+      return acc;
+    }, {});
+    rows.forEach((r) => {
+      if (r._id in byStatus) byStatus[r._id] = r.count;
+    });
+
+    const data = Object.entries(byStatus).map(([status, count]) => ({ status, count }));
+
+    return res.status(200).json({ success: true, data, message: 'Asset utilization fetched.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── GET /api/dashboard/maintenance-summary ────────────────────────────────────
+// MaintenanceRequest count grouped by status, for the Maintenance Bottlenecks chart.
+router.get('/maintenance-summary', async (req, res, next) => {
+  try {
+    const rows = await MaintenanceRequest.aggregate([
+      { $group: { _id: '$status', count: { $sum: 1 } } },
+    ]);
+
+    const byStatus = Object.values(MAINTENANCE_STATUS).reduce((acc, status) => {
+      acc[status] = 0;
+      return acc;
+    }, {});
+    rows.forEach((r) => {
+      if (r._id in byStatus) byStatus[r._id] = r.count;
+    });
+
+    const data = Object.entries(byStatus).map(([status, count]) => ({ status, count }));
+
+    return res.status(200).json({ success: true, data, message: 'Maintenance summary fetched.' });
+  } catch (err) {
+    next(err);
+  }
+});
+
+// ── GET /api/dashboard/recent-activity ────────────────────────────────────────
+// Last 10 ActivityLog entries, for the live Recent Activity timeline.
+router.get('/recent-activity', async (req, res, next) => {
+  try {
+    const entries = await ActivityLog.find({})
+      .populate('actor', 'name role')
+      .sort({ createdAt: -1 })
+      .limit(10);
+
+    return res.status(200).json({ success: true, data: entries, message: 'Recent activity fetched.' });
   } catch (err) {
     next(err);
   }

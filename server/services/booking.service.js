@@ -4,6 +4,7 @@ const { BOOKING_STATUS } = require('../constants/enums');
 const { notify } = require('./notification.service');
 const { NOTIFICATION_TYPE, ENTITY_TYPE } = require('../constants/enums');
 const socketStore = require('../config/socket');
+const { logActivity } = require('./activityLog.service');
 
 const emitSafe = (event, data) => {
   try { socketStore.getIO().to('broadcast').emit(event, data); } catch (_) {}
@@ -75,6 +76,14 @@ const createBooking = async ({ resourceId, requestedBy, startTime, endTime, purp
     entityId: booking._id,
   }).catch(() => {});
 
+  logActivity({
+    actor: requestedBy,
+    action: 'CREATE_BOOKING',
+    entityType: 'Booking',
+    entityId: booking._id,
+    details: { assetTag: asset.assetTag, assetName: asset.name },
+  }).catch(() => {});
+
   emitSafe('booking:created', { booking });
   return booking;
 };
@@ -100,6 +109,13 @@ const cancelBooking = async (bookingId) => {
     type: NOTIFICATION_TYPE.BOOKING_CANCELLED,
     message: `Your booking has been cancelled.`,
     entityType: ENTITY_TYPE.BOOKING,
+    entityId: booking._id,
+  }).catch(() => {});
+
+  logActivity({
+    actor: booking.requestedBy,
+    action: 'CANCEL_BOOKING',
+    entityType: 'Booking',
     entityId: booking._id,
   }).catch(() => {});
 

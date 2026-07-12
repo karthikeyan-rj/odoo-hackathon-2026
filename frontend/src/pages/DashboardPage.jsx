@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react';
 import { Link } from 'react-router-dom';
 import api from '../lib/api';
+import AssetUtilizationChart from '../components/dashboard/AssetUtilizationChart';
+import MaintenanceBottlenecksChart from '../components/dashboard/MaintenanceBottlenecksChart';
+import RecentActivityFeed from '../components/dashboard/RecentActivityFeed';
 
 function KPICard({ title, value, isLoading, type = 'default' }) {
   const typeStyles = {
-    default: 'border-border text-ink bg-surface',
-    alert: 'border-red-200 text-red-700 bg-red-50 shadow-sm',
-    warning: 'border-orange-200 text-orange-700 bg-orange-50 shadow-sm'
+    default: 'border-border/80 text-ink bg-surface/90',
+    alert: 'border-rose-500/20 text-rose-700 bg-rose-500/10 shadow-[inset_0_0_8px_rgba(244,63,94,0.1)]',
+    warning: 'border-amber-500/20 text-amber-700 bg-amber-500/10 shadow-[inset_0_0_8px_rgba(245,158,11,0.1)]',
   };
   const currentStyle = typeStyles[type];
 
   return (
-    <div className={`p-6 rounded-xl border ${currentStyle}`}>
+    <div className={`p-6 rounded-2xl border backdrop-blur-md shadow-sm transition-all hover:shadow-card ${currentStyle}`}>
       <h3 className="text-sm font-medium text-ink-muted mb-2">{title}</h3>
       <div className="text-3xl font-mono font-medium tracking-tight">
         {isLoading ? (
@@ -67,8 +70,18 @@ export default function DashboardPage() {
         <KPICard title="Maintenance Today" value={kpis?.maintenanceToday ?? 0} isLoading={loading} type={kpis?.maintenanceToday > 0 ? 'warning' : 'default'} />
         <KPICard title="Overdue Returns" value={kpis?.overdueReturns ?? 0} isLoading={loading} type={kpis?.overdueReturns > 0 ? 'alert' : 'default'} />
       </div>
-      
-      {/* Visual placeholder for further dashboard elements like activity feed if desired */}
+
+      <div>
+        <h2 className="text-lg font-bold text-ink mb-4">Analytics</h2>
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+          <AssetUtilizationChart />
+          <MaintenanceBottlenecksChart />
+        </div>
+      </div>
+
+      <div>
+        <RecentActivityFeed />
+      </div>
     </div>
   );
 }

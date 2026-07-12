@@ -3,6 +3,7 @@ import { useParams, Link } from 'react-router-dom';
 import api from '../../lib/api';
 import StatusChip from '../../components/ui/StatusChip';
 import DataTable from '../../components/ui/DataTable';
+import AssetQrCode from '../../components/assets/AssetQrCode';
 import { useSocket } from '../../contexts/SocketContext';
 
 export default function AssetDetailPage() {
@@ -82,7 +83,7 @@ export default function AssetDetailPage() {
         ← Back to Registry
       </Link>
       
-      <div className="bg-surface border border-border rounded-xl p-8 shadow-sm">
+      <div className="bg-surface/90 backdrop-blur-md border border-border/80 rounded-2xl p-8 shadow-sm">
         <div className="flex justify-between items-start mb-6">
           <div>
             <h1 className="text-3xl font-bold tracking-tight text-ink mb-1">{asset.name}</h1>
@@ -119,6 +120,8 @@ export default function AssetDetailPage() {
           </div>
         </div>
       </div>
+
+      <AssetQrCode asset={asset} />
 
       <div>
         <h2 className="text-lg font-bold text-ink mb-4">Activity Timeline</h2>

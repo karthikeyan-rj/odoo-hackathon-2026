@@ -1,6 +1,10 @@
 import axios from 'axios';
 
-const api = axios.create({ baseURL: '/api' });
+// In dev, Vite proxies '/api' to the local backend. In production (e.g. Vercel),
+// the backend lives on a separate host, so VITE_API_URL must point at it.
+const baseURL = import.meta.env.VITE_API_URL ? `${import.meta.env.VITE_API_URL}/api` : '/api';
+
+const api = axios.create({ baseURL });
 
 // Attach JWT from localStorage on every request
 api.interceptors.request.use((config) => {

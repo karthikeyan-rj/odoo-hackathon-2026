@@ -56,6 +56,9 @@ if (process.env.NODE_ENV !== 'production') {
   app.use(morgan('dev'));
 }
 
+// ── Health Check (for Render / uptime pings) ──────────────────────────────────
+app.get('/health', (req, res) => res.status(200).json({ success: true, data: null, message: 'OK' }));
+
 // ── Routes ─────────────────────────────────────────────────────────────────────
 const allocationRouter = require('./routes/allocation.routes');
 app.use('/api/auth',               require('./routes/auth.routes'));

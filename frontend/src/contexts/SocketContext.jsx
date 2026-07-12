@@ -17,7 +17,9 @@ export function SocketProvider({ children }) {
       return;
     }
 
-    const socket = io('/', {
+    // In dev, Vite proxies socket.io to the local backend. In production, the
+    // backend lives on a separate host, so VITE_API_URL must point at it.
+    const socket = io(import.meta.env.VITE_API_URL || '/', {
       auth: { token },
       transports: ['websocket', 'polling'],
     });

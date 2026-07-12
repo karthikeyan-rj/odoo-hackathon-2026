@@ -114,6 +114,7 @@ export function createAuditCycle(data) { return api.post('/api/audits', data); }
 export function getAuditDetails(id) { return api.get(`/api/audits/${id}`); }
 export function updateAuditItem(cycleId, itemId, data) { return api.put(`/api/audits/${cycleId}/items/${itemId}`, data); }
 export function closeAuditCycle(id) { return api.put(`/api/audits/${id}/close`); }
+export function getActivityLogs() { return api.get('/api/activity-logs'); }
 
 // Department Head specific
 export function getDepartmentAllocations() { return api.get('/api/allocations/department'); }

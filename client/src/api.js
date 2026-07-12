@@ -3,7 +3,7 @@ import axios from 'axios'
 const api = axios.create({
   // Local development defaults to port 5000. Set VITE_API_URL in Vercel
   // (for example, https://assetflow-api.onrender.com) for production.
-  baseURL: import.meta.env.VITE_API_URL || 'http://localhost:5000'
+  baseURL: import.meta.env.VITE_API_URL || ''
 })
 
 // attach token to every request

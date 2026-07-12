@@ -1,8 +1,12 @@
 {
   "buildCommand": "cd client && npm ci && npm run build",
   "outputDirectory": "client/dist",
-  "framework": "vite",
+  "installCommand": "npm install && cd client && npm install && cd ../server && npm install",
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api"
+    },
     {
       "source": "/(.*)",
       "destination": "/index.html"

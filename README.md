@@ -5,5 +5,4 @@ A scalable full-stack web application built for the Odoo Hackathon 2026, focused
 branches:
       main-> structured project flow
    contributor branches:
-        ragasudha
-        karthi
+       

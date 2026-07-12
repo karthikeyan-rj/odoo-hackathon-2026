@@ -92,6 +92,19 @@ Admin quick actions:
 
 ---
 
+## Demo Login Credentials
+
+Use the following accounts to test each role in AssetFlow:
+
+| Name | Email | Password | Role | Department | Status |
+|---|---|---|---|---|---|
+| System Admin | admin@assetflow.local | `change_this_password` | Admin | Human Resources | Active |
+| John Employee | john@assetflow.local | `change_this_password` | Employee | IT | Active |
+| Asset Manager | manager@assetflow.local | `change_this_password` | Asset Manager | IT | Active |
+| Department Head | depthead@assetflow.local | `change_this_password` | Department Head | Human Resources | Active |
+
+> These credentials are intended only for demonstration and testing. Change the passwords before using the application in production.
+
 ### Asset Manager Dashboard
 
 The Asset Manager dashboard focuses on daily asset operations.

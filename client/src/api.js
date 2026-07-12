@@ -108,6 +108,13 @@ export function getNotifications() { return api.get('/api/notifications'); }
 export function markNotificationRead(id) { return api.put(`/api/notifications/${id}/read`); }
 export function markAllNotificationsRead() { return api.put('/api/notifications/read-all'); }
 
+// Audits
+export function getAudits() { return api.get('/api/audits'); }
+export function createAuditCycle(data) { return api.post('/api/audits', data); }
+export function getAuditDetails(id) { return api.get(`/api/audits/${id}`); }
+export function updateAuditItem(cycleId, itemId, data) { return api.put(`/api/audits/${cycleId}/items/${itemId}`, data); }
+export function closeAuditCycle(id) { return api.put(`/api/audits/${id}/close`); }
+
 // Department Head specific
 export function getDepartmentAllocations() { return api.get('/api/allocations/department'); }
 export function getDepartmentApprovals() { return api.get('/api/transfers/department'); }

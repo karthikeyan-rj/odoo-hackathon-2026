@@ -15,6 +15,7 @@ function Layout() {
       { label: "Allocation Manager",    path: "/allocations" },
       { label: "Maintenance Approvals", path: "/maintenance-approvals" },
       { label: "Org Setup",             path: "/org-setup" },
+      { label: "Asset Audits",          path: "/audits" },
       { label: "Notifications",         path: "/notifications" }
     ];
   } else if (user.role === "AssetManager") {
@@ -23,6 +24,7 @@ function Layout() {
       { label: "Asset Directory",       path: "/assets" },
       { label: "Allocation Manager",    path: "/allocations" },
       { label: "Maintenance Approvals", path: "/maintenance-approvals" },
+      { label: "Asset Audits",          path: "/audits" },
       { label: "Notifications",         path: "/notifications" }
     ];
   } else if (user.role === "DepartmentHead") {

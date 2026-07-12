@@ -41,15 +41,8 @@ export default function Dashboard() {
   const btn = "w-full py-2 bg-blue-600 text-white rounded font-semibold hover:bg-blue-700 text-xs";
 
   return (
-    <div className="min-h-screen bg-zinc-50 text-xs text-zinc-800">
-      <header className="flex justify-between items-center px-6 py-3 bg-white border-b border-zinc-200">
-        <b className="text-sm text-zinc-900">AssetFlow</b>
-        <div className="flex gap-4 items-center text-zinc-600">{user.name} — {user.role}
-          <button onClick={logout} className="px-3 py-1 border border-zinc-300 rounded hover:bg-zinc-100">Logout</button>
-        </div>
-      </header>
-      <main className="max-w-5xl mx-auto p-6 space-y-5">
-        {msg && <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded">{msg} <button onClick={() => setMsg("")} className="ml-2 font-bold">×</button></div>}
+    <div className="space-y-5">
+      {msg && <div className="p-3 bg-red-50 border border-red-200 text-red-700 rounded">{msg} <button onClick={() => setMsg("")} className="ml-2 font-bold">×</button></div>}
 
         <div className="grid grid-cols-4 gap-4">
           {[["Active Allocations", active.length, false], ["Upcoming Bookings", books.filter(b => b.status === "Upcoming").length, false], ["Pending Maintenance", maint.filter(m => m.status === "Pending").length, false], ["Overdue Returns", overdue, overdue > 0]].map(([l, v, warn]) => (
@@ -93,7 +86,6 @@ export default function Dashboard() {
             </form>
           </div>
         </div>
-      </main>
     </div>
   );
 }
